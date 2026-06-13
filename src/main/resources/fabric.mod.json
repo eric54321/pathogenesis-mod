@@ -15,6 +15,9 @@
   "entrypoints": {
     "main": [
       "com.pathogenesis.PathogenesisMod"
+    ],
+    "client": [
+      "com.pathogenesis.PathogenesisModClient"
     ]
   },
   "mixins": [],
