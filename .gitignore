@@ -15,8 +15,8 @@ gradle/wrapper/gradle-wrapper.jar
 .project
 .settings/
 
-# VS Code
-.vscode/
+# VS Code — only ignore user-specific local settings, not shared workspace config
+.vscode/*.code-workspace
 
 # macOS
 .DS_Store
