@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "pathogenesis",
+  "version": "${version}",
+  "name": "Pathogenesis",
+  "description": "A wave-based cooperative immune defense game set inside a human body. Fight pathogens and cancer cells as immune cells.",
+  "authors": [
+    "Eric Allen"
+  ],
+  "contact": {
+    "sources": "https://github.com/ericallen/pathogenesis-mod"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.pathogenesis.PathogenesisMod"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "fabric-api": "*",
+    "minecraft": "~1.21.1",
+    "java": ">=21"
+  }
+}
