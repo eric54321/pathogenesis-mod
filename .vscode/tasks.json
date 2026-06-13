@@ -27,6 +27,17 @@
       "problemMatcher": []
     },
     {
+      "label": "deploy to mods folder",
+      "type": "shell",
+      "command": "powershell -ExecutionPolicy Bypass -File .\\deploy.ps1",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "clean",
       "type": "shell",
       "command": ".\\gradlew.bat clean",
