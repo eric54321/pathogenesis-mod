@@ -34,9 +34,12 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
+    // Toolchain pins the JDK to 21 regardless of which Java is installed globally.
+    // Gradle will auto-download Java 21 if it can't find it locally.
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
     withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
