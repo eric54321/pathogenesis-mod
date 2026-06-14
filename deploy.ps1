@@ -1,7 +1,7 @@
 # deploy.ps1 — Build Pathogenesis and copy the JAR to your Fabric mods folder.
 # Run this from the project root: .\deploy.ps1
 
-$modsFolder = "C:\Users\eric5\AppData\Roaming\.minecraft\mods"
+$modsFolder = "$env:APPDATA\.minecraft\mods"
 $jarPattern = "build\libs\pathogenesis-*.jar"
 
 Write-Host "Building Pathogenesis..." -ForegroundColor Cyan
