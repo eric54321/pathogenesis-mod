@@ -1,13 +1,25 @@
 package com.pathogenesis;
 
+import com.pathogenesis.entity.model.AscariModel;
+import com.pathogenesis.entity.model.DermatophyteModel;
+import com.pathogenesis.entity.model.StrongyloideModel;
+import com.pathogenesis.entity.model.TaeniaModel;
 import com.pathogenesis.entity.model.PhageModel;
 import com.pathogenesis.entity.model.RogueCellModel;
+import com.pathogenesis.entity.model.StaphModel;
+import com.pathogenesis.entity.model.StreptococcusModel;
 import com.pathogenesis.entity.model.VironModel;
+import com.pathogenesis.entity.renderer.AscariRenderer;
 import com.pathogenesis.entity.renderer.CoronavirusRenderer;
+import com.pathogenesis.entity.renderer.DermatophyteRenderer;
+import com.pathogenesis.entity.renderer.StrongyloideRenderer;
+import com.pathogenesis.entity.renderer.TaeniaRenderer;
 import com.pathogenesis.entity.renderer.TentacleRenderer;
 import com.pathogenesis.entity.renderer.InfluenzaRenderer;
 import com.pathogenesis.entity.renderer.PhageRenderer;
 import com.pathogenesis.entity.renderer.RogueCellRenderer;
+import com.pathogenesis.entity.renderer.StaphRenderer;
+import com.pathogenesis.entity.renderer.StreptococcusRenderer;
 import com.pathogenesis.entity.renderer.VironRenderer;
 import com.pathogenesis.init.ModEntities;
 import com.pathogenesis.init.ModModelLayers;
@@ -41,6 +53,26 @@ public class PathogenesisModClient implements ClientModInitializer {
 
         // Tentacle projectile
         EntityRendererRegistry.register(ModEntities.TENTACLE, TentacleRenderer::new);
+
+        // Stage 1 — Skin pathogens
+        EntityModelLayerRegistry.registerModelLayer(ModModelLayers.STAPH, StaphModel::getTexturedModelData);
+        EntityRendererRegistry.register(ModEntities.STAPH, StaphRenderer::new);
+
+        EntityModelLayerRegistry.registerModelLayer(ModModelLayers.STREPTOCOCCUS, StreptococcusModel::getTexturedModelData);
+        EntityRendererRegistry.register(ModEntities.STREPTOCOCCUS, StreptococcusRenderer::new);
+
+        EntityModelLayerRegistry.registerModelLayer(ModModelLayers.DERMATOPHYTE, DermatophyteModel::getTexturedModelData);
+        EntityRendererRegistry.register(ModEntities.DERMATOPHYTE, DermatophyteRenderer::new);
+
+        // GI Tract — food-borne parasites
+        EntityModelLayerRegistry.registerModelLayer(ModModelLayers.ASCARI, AscariModel::getTexturedModelData);
+        EntityRendererRegistry.register(ModEntities.ASCARI, AscariRenderer::new);
+
+        EntityModelLayerRegistry.registerModelLayer(ModModelLayers.TAENIA, TaeniaModel::getTexturedModelData);
+        EntityRendererRegistry.register(ModEntities.TAENIA, TaeniaRenderer::new);
+
+        EntityModelLayerRegistry.registerModelLayer(ModModelLayers.STRONGYLOIDE, StrongyloideModel::getTexturedModelData);
+        EntityRendererRegistry.register(ModEntities.STRONGYLOIDE, StrongyloideRenderer::new);
 
         PathogenesisMod.LOGGER.info("Pathogenesis client initialized.");
     }

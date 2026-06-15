@@ -2,9 +2,15 @@ package com.pathogenesis.system;
 
 import com.pathogenesis.PathogenesisMod;
 import com.pathogenesis.entity.CoronavirusEntity;
+import com.pathogenesis.entity.AscariEntity;
+import com.pathogenesis.entity.DermatophyteEntity;
+import com.pathogenesis.entity.StrongyloideEntity;
+import com.pathogenesis.entity.TaeniaEntity;
 import com.pathogenesis.entity.InfluenzaEntity;
 import com.pathogenesis.entity.PhageEntity;
 import com.pathogenesis.entity.RogueCellEntity;
+import com.pathogenesis.entity.StaphEntity;
+import com.pathogenesis.entity.StreptococcusEntity;
 import com.pathogenesis.entity.VironEntity;
 import com.pathogenesis.init.ModEntities;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -187,57 +193,94 @@ public class WaveSpawner {
                 (int) spawnZ
             );
 
-            // Pick enemy type based on wave number:
-            //   Wave 1-2:  RogueCell + Viron
-            //   Wave 3-4:  add Influenza
-            //   Wave 5-6:  add Coronavirus
-            //   Wave 7+:   add Bacteriophage (precision, high damage)
-            net.minecraft.entity.mob.MobEntity enemy;
-            int type = pickEnemyType(i, totalEnemies);
-            enemy = switch (type) {
-                case 1 -> new VironEntity(ModEntities.VIRON, world);
-                case 2 -> new InfluenzaEntity(ModEntities.INFLUENZA, world);
-                case 3 -> new CoronavirusEntity(ModEntities.CORONAVIRUS, world);
-                case 4 -> new PhageEntity(ModEntities.PHAGE, world);
-                default -> new RogueCellEntity(ModEntities.ROGUE_CELL, world);
-            };
-            enemy.refreshPositionAndAngles(spawnX, spawnY, spawnZ, 0.0f, 0.0f);
-            world.spawnEntity(enemy);
+            spawnAtPosition(world, pickEnemyType(i), spawnX, spawnY, spawnZ);
         }
     }
 
     // -------------------------------------------------------------------------
-    // Enemy type selection
+    // Enemy type selection and spawning
     // -------------------------------------------------------------------------
 
     /**
-     * Returns an enemy type code based on wave progression and enemy index.
-     *   0 = RogueCell, 1 = Viron, 2 = Influenza, 3 = Coronavirus
+     * Spawns one "unit" at the given position. Staph spawns as a cluster of 3;
+     * all other types spawn a single entity.
      *
-     * Wave 1-2: 60% RogueCell, 40% Viron
-     * Wave 3-4: 40% RogueCell, 30% Viron, 30% Influenza
-     * Wave 5+:  25% each of all four types
+     * Type codes:
+     *   0 = Staph (cluster)   1 = Streptococcus   2 = Dermatophyte
+     *   3 = RogueCell         4 = Viron            5 = Influenza
+     *   6 = Coronavirus       7 = Phage
+     *   8 = Ascari            9 = Taenia           10 = Strongyloide
      */
-    private static int pickEnemyType(int enemyIndex, int totalEnemies) {
-        // Use modulo of enemy index for deterministic spread within a wave
+    private static void spawnAtPosition(ServerWorld world, int type, double x, double y, double z) {
+        if (type == 0) {
+            // Staph spawns as a tight cluster of 3 — forces AoE play
+            for (int c = 0; c < 3; c++) {
+                double a = (2 * Math.PI / 3) * c;
+                StaphEntity s = new StaphEntity(ModEntities.STAPH, world);
+                s.refreshPositionAndAngles(x + Math.cos(a) * 1.2, y, z + Math.sin(a) * 1.2, 0, 0);
+                world.spawnEntity(s);
+            }
+            return;
+        }
+        net.minecraft.entity.mob.MobEntity enemy = switch (type) {
+            case 1  -> new StreptococcusEntity(ModEntities.STREPTOCOCCUS, world);
+            case 2  -> new DermatophyteEntity(ModEntities.DERMATOPHYTE, world);
+            case 3  -> new RogueCellEntity(ModEntities.ROGUE_CELL, world);
+            case 4  -> new VironEntity(ModEntities.VIRON, world);
+            case 5  -> new InfluenzaEntity(ModEntities.INFLUENZA, world);
+            case 6  -> new CoronavirusEntity(ModEntities.CORONAVIRUS, world);
+            case 8  -> new AscariEntity(ModEntities.ASCARI, world);
+            case 9  -> new TaeniaEntity(ModEntities.TAENIA, world);
+            case 10 -> new StrongyloideEntity(ModEntities.STRONGYLOIDE, world);
+            default -> new PhageEntity(ModEntities.PHAGE, world);
+        };
+        enemy.refreshPositionAndAngles(x, y, z, 0, 0);
+        world.spawnEntity(enemy);
+    }
+
+    /**
+     * Returns an enemy type code based on wave number.
+     * Stage 1 (waves 1-3): skin pathogens only — Staph, Strep, Dermatophyte.
+     * Wave 4+: later-stage enemies start mixing in as the infection advances.
+     */
+    private static int pickEnemyType(int enemyIndex) {
         int slot = enemyIndex % 20;
-        if (waveNumber <= 2) {
-            return slot < 12 ? 0 : 1;            // 60% RogueCell, 40% Viron
-        } else if (waveNumber <= 4) {
-            if (slot < 8) return 0;              // 40% RogueCell
-            if (slot < 14) return 1;             // 30% Viron
-            return 2;                            // 30% Influenza
-        } else if (waveNumber <= 6) {
-            if (slot < 5)  return 0;             // 25% RogueCell
-            if (slot < 10) return 1;             // 25% Viron
-            if (slot < 15) return 2;             // 25% Influenza
-            return 3;                            // 25% Coronavirus
+        if (waveNumber <= 3) {
+            // Stage 1 — skin: 60% Staph clusters, 25% Strep, 15% Dermatophyte
+            if (slot < 12) return 0;
+            if (slot < 17) return 1;
+            return 2;
+        } else if (waveNumber <= 5) {
+            // Transition: skin enemies plus RogueCell appearing
+            if (slot < 6)  return 0;   // 30% Staph
+            if (slot < 10) return 1;   // 20% Strep
+            if (slot < 12) return 2;   // 10% Dermatophyte
+            if (slot < 17) return 3;   // 25% RogueCell
+            return 4;                  // 15% Viron
+        } else if (waveNumber <= 8) {
+            // Mid-game — full roster plus worms start appearing
+            if (slot < 4)  return 0;   // 20% Staph
+            if (slot < 6)  return 1;   // 10% Strep
+            if (slot < 7)  return 2;   //  5% Dermatophyte
+            if (slot < 10) return 3;   // 15% RogueCell
+            if (slot < 13) return 4;   // 15% Viron
+            if (slot < 15) return 5;   // 10% Influenza
+            if (slot < 17) return 6;   // 10% Coronavirus
+            if (slot < 18) return 8;   //  5% Ascari — growing nightmare
+            if (slot < 19) return 9;   //  5% Taenia — segmented horror
+            return 7;                  //  5% Phage
         } else {
-            if (slot < 5)  return 0;             // 25% RogueCell
-            if (slot < 10) return 1;             // 25% Viron
-            if (slot < 14) return 3;             // 20% Coronavirus
-            if (slot < 18) return 2;             // 20% Influenza
-            return 4;                            // 10% Bacteriophage — rare, devastating
+            // Late game — worms are common, everything escalates
+            if (slot < 3)  return 0;   // 15% Staph
+            if (slot < 5)  return 3;   // 10% RogueCell
+            if (slot < 7)  return 4;   // 10% Viron
+            if (slot < 9)  return 6;   // 10% Coronavirus
+            if (slot < 12) return 8;   // 15% Ascari — growing nightmare
+            if (slot < 15) return 9;   // 15% Taenia — segmented horror
+            if (slot < 17) return 10;  // 10% Strongyloide — self-replicating threat
+            if (slot < 18) return 5;   //  5% Influenza
+            if (slot < 19) return 7;   //  5% Phage
+            return 10;                 //  5% extra Strongyloide
         }
     }
 

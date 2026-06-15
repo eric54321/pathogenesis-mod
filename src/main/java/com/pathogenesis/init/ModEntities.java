@@ -1,10 +1,16 @@
 package com.pathogenesis.init;
 
 import com.pathogenesis.PathogenesisMod;
+import com.pathogenesis.entity.AscariEntity;
 import com.pathogenesis.entity.CoronavirusEntity;
+import com.pathogenesis.entity.DermatophyteEntity;
 import com.pathogenesis.entity.InfluenzaEntity;
 import com.pathogenesis.entity.PhageEntity;
 import com.pathogenesis.entity.RogueCellEntity;
+import com.pathogenesis.entity.StaphEntity;
+import com.pathogenesis.entity.StrongyloideEntity;
+import com.pathogenesis.entity.StreptococcusEntity;
+import com.pathogenesis.entity.TaeniaEntity;
 import com.pathogenesis.entity.TentacleProjectile;
 import com.pathogenesis.entity.VironEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -91,6 +97,65 @@ public class ModEntities {
             .build()
     );
 
+    // -------------------------------------------------------------------------
+    // Stage 1 — Skin pathogens
+    // -------------------------------------------------------------------------
+
+    public static final EntityType<StaphEntity> STAPH = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(PathogenesisMod.MOD_ID, "staph"),
+        EntityType.Builder.create(StaphEntity::new, SpawnGroup.MONSTER)
+            .dimensions(0.6f, 0.6f)
+            .build()
+    );
+
+    public static final EntityType<StreptococcusEntity> STREPTOCOCCUS = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(PathogenesisMod.MOD_ID, "streptococcus"),
+        EntityType.Builder.create(StreptococcusEntity::new, SpawnGroup.MONSTER)
+            .dimensions(0.8f, 0.6f)
+            .build()
+    );
+
+    public static final EntityType<DermatophyteEntity> DERMATOPHYTE = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(PathogenesisMod.MOD_ID, "dermatophyte"),
+        EntityType.Builder.create(DermatophyteEntity::new, SpawnGroup.MONSTER)
+            .dimensions(0.4f, 0.8f)
+            .build()
+    );
+
+    // -------------------------------------------------------------------------
+    // GI Tract — food-borne parasites (worms)
+    // -------------------------------------------------------------------------
+
+    /** Ascaris — giant roundworm. Grows every 10 seconds to 3.5x its original size. */
+    public static final EntityType<AscariEntity> ASCARI = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(PathogenesisMod.MOD_ID, "ascari"),
+        EntityType.Builder.create(AscariEntity::new, SpawnGroup.MONSTER)
+            .dimensions(0.8f, 1.8f)
+            .build()
+    );
+
+    /** Taenia — tapeworm. Grows segments over time, sheds them as sub-entities on death. */
+    public static final EntityType<TaeniaEntity> TAENIA = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(PathogenesisMod.MOD_ID, "taenia"),
+        EntityType.Builder.create(TaeniaEntity::new, SpawnGroup.MONSTER)
+            .dimensions(1.0f, 0.6f)
+            .build()
+    );
+
+    /** Strongyloides — threadworm. Adults spawn larvae; both grow. Kill the adult first. */
+    public static final EntityType<StrongyloideEntity> STRONGYLOIDE = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(PathogenesisMod.MOD_ID, "strongyloide"),
+        EntityType.Builder.create(StrongyloideEntity::new, SpawnGroup.MONSTER)
+            .dimensions(0.4f, 1.6f)
+            .build()
+    );
+
     /**
      * Called from PathogenesisMod.onInitialize().
      * Registers entity attribute sets (health, speed, damage) for each mob.
@@ -102,6 +167,12 @@ public class ModEntities {
         FabricDefaultAttributeRegistry.register(INFLUENZA, InfluenzaEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(CORONAVIRUS, CoronavirusEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(PHAGE, PhageEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(STAPH, StaphEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(STREPTOCOCCUS, StreptococcusEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(DERMATOPHYTE, DermatophyteEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(ASCARI, AscariEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(TAENIA, TaeniaEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(STRONGYLOIDE, StrongyloideEntity.createAttributes());
 
         PathogenesisMod.LOGGER.info("Pathogenesis entities registered.");
     }

@@ -18,4 +18,22 @@ public class ModModelLayers {
 
     public static final EntityModelLayer PHAGE =
         new EntityModelLayer(Identifier.of("pathogenesis", "phage"), "main");
+
+    public static final EntityModelLayer STAPH =
+        new EntityModelLayer(Identifier.of("pathogenesis", "staph"), "main");
+
+    public static final EntityModelLayer STREPTOCOCCUS =
+        new EntityModelLayer(Identifier.of("pathogenesis", "streptococcus"), "main");
+
+    public static final EntityModelLayer DERMATOPHYTE =
+        new EntityModelLayer(Identifier.of("pathogenesis", "dermatophyte"), "main");
+
+    public static final EntityModelLayer ASCARI =
+        new EntityModelLayer(Identifier.of("pathogenesis", "ascari"), "main");
+
+    public static final EntityModelLayer TAENIA =
+        new EntityModelLayer(Identifier.of("pathogenesis", "taenia"), "main");
+
+    public static final EntityModelLayer STRONGYLOIDE =
+        new EntityModelLayer(Identifier.of("pathogenesis", "strongyloide"), "main");
 }
