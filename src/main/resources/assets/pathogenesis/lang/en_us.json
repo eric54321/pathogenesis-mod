@@ -12,6 +12,7 @@
   "entity.pathogenesis.dermatophyte": "Dermatophyte",
   "entity.pathogenesis.bacterium_boss": "Bacillus Anthracis",
   "item.pathogenesis.cart_injector": "CAR-T Injector",
+  "item.pathogenesis.pathogen_tracker": "Pathogen Tracker",
   "item.pathogenesis.cart_injector.tooltip1": "Reprograms your T-cells to permanently seek and destroy cancer cells.",
   "item.pathogenesis.cart_injector.tooltip2": "Permanently increases attack damage. One use only.",
   "itemGroup.pathogenesis.main": "Pathogenesis"

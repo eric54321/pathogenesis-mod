@@ -2,6 +2,7 @@ package com.pathogenesis.init;
 
 import com.pathogenesis.PathogenesisMod;
 import com.pathogenesis.item.CARTInjectorItem;
+import com.pathogenesis.item.PathogenTrackerItem;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
@@ -27,6 +28,12 @@ public class ModItems {
         new CARTInjectorItem(new Item.Settings().maxCount(1))
     );
 
+    public static final PathogenTrackerItem PATHOGEN_TRACKER = Registry.register(
+        Registries.ITEM,
+        Identifier.of(PathogenesisMod.MOD_ID, "pathogen_tracker"),
+        new PathogenTrackerItem(new Item.Settings().maxCount(1))
+    );
+
     /**
      * Called from PathogenesisMod.onInitialize().
      * Adds our items to the Medicine & Potions creative tab so testers
@@ -36,6 +43,7 @@ public class ModItems {
         // Add CAR-T Injector to the medicine creative tab for easy testing
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> {
             entries.add(CART_INJECTOR);
+            entries.add(PATHOGEN_TRACKER);
         });
 
         PathogenesisMod.LOGGER.info("Pathogenesis items registered.");

@@ -2,6 +2,7 @@ package com.pathogenesis;
 
 import com.pathogenesis.init.ModEntities;
 import com.pathogenesis.init.ModItems;
+import com.pathogenesis.system.BossArena;
 import com.pathogenesis.system.HostHealth;
 import com.pathogenesis.system.WaveSpawner;
 import net.fabricmc.api.ModInitializer;
@@ -58,6 +59,7 @@ public class PathogenesisMod implements ModInitializer {
         ModItems.register();
         WaveSpawner.register();
         HostHealth.register();
+        BossArena.register();
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             long now = server.getTicks();
