@@ -80,8 +80,9 @@ public class RogueCellModel extends EntityModel<RogueCellEntity> {
     public void setAngles(RogueCellEntity entity, float limbAngle, float limbDistance,
                           float animationProgress, float headYaw, float headPitch) {
         float spin = animationProgress * 0.8f;
-        float tiltYaw   = headYaw   * ((float)Math.PI / 180f) * 0.5f;
-        float tiltPitch = headPitch * ((float)Math.PI / 180f) * 0.5f;
+        // Lean the whole disc toward the target — higher multiplier = more dramatic tilt
+        float tiltYaw   = headYaw   * ((float)Math.PI / 180f) * 0.85f;
+        float tiltPitch = headPitch * ((float)Math.PI / 180f) * 0.85f;
 
         for (ModelPart p : new ModelPart[]{core, segN, segS, segE, segW,
                 segNE, segNW, segSE, segSW, innerNE, innerNW, innerSE, innerSW}) {
@@ -89,21 +90,30 @@ public class RogueCellModel extends EntityModel<RogueCellEntity> {
             p.pitch = tiltPitch;
         }
 
-        // Continuous slow wave so tentacles are always moving
+        // Continuous slow wave
         float wave = (float)Math.sin(animationProgress * 0.08f) * 0.35f;
 
-        // Lash animation on 60-tick cycle — snap out hard, slowly retract
+        // Lash animation on 60-tick cycle
         float cycle = (animationProgress % 60f) / 60f;
         float lashFactor = (cycle < 0.10f) ? cycle / 0.10f
                          : (cycle < 0.30f) ? 1f - (cycle - 0.10f) / 0.20f
                          : 0f;
-        // base droop + wave + dramatic lash snap
-        float tentPitch = 0.5f + wave - lashFactor * 2.0f;
 
-        setTentacleAngles(tentNb, tentNm, tentNt, spin,                              tentPitch);
-        setTentacleAngles(tentSb, tentSm, tentSt, spin + (float)Math.PI,             tentPitch);
-        setTentacleAngles(tentEb, tentEm, tentEt, spin - (float)(Math.PI / 2),       tentPitch);
-        setTentacleAngles(tentWb, tentWm, tentWt, spin + (float)(Math.PI / 2),       tentPitch);
+        // Target angle in world space — tentacles facing the target reach forward,
+        // tentacles facing away droop back (like arms reaching out toward something)
+        float targetAngle = headYaw * ((float)Math.PI / 180f);
+        float reach = 0.55f; // how much front tentacles extend vs rear ones droop
+
+        float basePitch = 0.5f + wave - lashFactor * 2.0f;
+        float pitchN = basePitch - (float)Math.cos(spin - targetAngle)          * reach;
+        float pitchS = basePitch - (float)Math.cos(spin + Math.PI - targetAngle) * reach;
+        float pitchE = basePitch - (float)Math.cos(spin - Math.PI/2 - targetAngle) * reach;
+        float pitchW = basePitch - (float)Math.cos(spin + Math.PI/2 - targetAngle) * reach;
+
+        setTentacleAngles(tentNb, tentNm, tentNt, spin + tiltYaw,                              pitchN);
+        setTentacleAngles(tentSb, tentSm, tentSt, spin + tiltYaw + (float)Math.PI,             pitchS);
+        setTentacleAngles(tentEb, tentEm, tentEt, spin + tiltYaw - (float)(Math.PI / 2),       pitchE);
+        setTentacleAngles(tentWb, tentWm, tentWt, spin + tiltYaw + (float)(Math.PI / 2),       pitchW);
     }
 
     private void renderTentacle(ModelPart base, ModelPart mid, ModelPart tip,
