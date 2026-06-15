@@ -82,7 +82,7 @@ public class BacteriumBossEntity extends HostileEntity {
 
     public static DefaultAttributeContainer.Builder createAttributes() {
         return HostileEntity.createHostileAttributes()
-            .add(EntityAttributes.GENERIC_MAX_HEALTH,           200.0)
+            .add(EntityAttributes.GENERIC_MAX_HEALTH,           400.0)
             .add(EntityAttributes.GENERIC_MOVEMENT_SPEED,       0.20)
             .add(EntityAttributes.GENERIC_ATTACK_DAMAGE,        14.0)
             .add(EntityAttributes.GENERIC_FOLLOW_RANGE,         48.0)
@@ -109,7 +109,7 @@ public class BacteriumBossEntity extends HostileEntity {
 
         bossBar.setPercent(this.getHealth() / this.getMaxHealth());
 
-        // Check phase transition
+        // Check phase transition at 50% HP
         if (!phase2 && this.getHealth() <= this.getMaxHealth() * 0.5f) {
             enterPhase2(world);
         }
@@ -140,6 +140,9 @@ public class BacteriumBossEntity extends HostileEntity {
         phase2 = true;
         attackPhase = 0;
         attackTimer = 60;
+
+        // Heal back to full for phase 2
+        this.setHealth(this.getMaxHealth());
 
         bossBar.setName(Text.literal("Bacillus Anthracis — PHASE 2").formatted(Formatting.AQUA, Formatting.BOLD));
         bossBar.setColor(BossBar.Color.BLUE);
