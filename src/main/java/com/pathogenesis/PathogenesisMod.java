@@ -86,64 +86,85 @@ public class PathogenesisMod implements ModInitializer {
 
             List<BlockPos> roomBlocks = new ArrayList<>();
 
-            // Checkered floor: white + light gray concrete (like hospital tile)
-            for (int x = rx-4; x <= rx+4; x++) {
-                for (int z = rz-4; z <= rz+4; z++) {
+            // Bigger room — outer walls at ±7, height 7 (ceiling at ry+6)
+            int W = 7; // half-width
+
+            // Checkered floor: white + light gray concrete
+            for (int x = rx-W; x <= rx+W; x++) {
+                for (int z = rz-W; z <= rz+W; z++) {
                     Block b = ((x + z) % 2 == 0) ? Blocks.WHITE_CONCRETE : Blocks.LIGHT_GRAY_CONCRETE;
                     place(world, x, ry-1, z, b, roomBlocks);
                 }
             }
 
             // White concrete ceiling
-            for (int x = rx-4; x <= rx+4; x++) {
-                for (int z = rz-4; z <= rz+4; z++) {
-                    place(world, x, ry+4, z, Blocks.WHITE_CONCRETE, roomBlocks);
+            for (int x = rx-W; x <= rx+W; x++) {
+                for (int z = rz-W; z <= rz+W; z++) {
+                    place(world, x, ry+6, z, Blocks.WHITE_CONCRETE, roomBlocks);
                 }
             }
 
-            // Sea lantern lights in ceiling
-            for (int[] off : new int[][]{{-2,-2},{2,-2},{-2,2},{2,2}}) {
-                place(world, rx+off[0], ry+4, rz+off[1], Blocks.SEA_LANTERN, roomBlocks);
+            // Sea lantern ceiling lights (6 of them spread out)
+            for (int[] off : new int[][]{{-4,-4},{0,-4},{4,-4},{-4,4},{0,4},{4,4}}) {
+                place(world, rx+off[0], ry+6, rz+off[1], Blocks.SEA_LANTERN, roomBlocks);
             }
 
             // White concrete walls
+            for (int y = ry; y <= ry+5; y++) {
+                for (int x = rx-W; x <= rx+W; x++) {
+                    place(world, x, y, rz-W, Blocks.WHITE_CONCRETE, roomBlocks); // north
+                    place(world, x, y, rz+W, Blocks.WHITE_CONCRETE, roomBlocks); // south
+                }
+                for (int z = rz-(W-1); z <= rz+(W-1); z++) {
+                    place(world, rx+W, y, z, Blocks.WHITE_CONCRETE, roomBlocks); // east
+                    place(world, rx-W, y, z, Blocks.WHITE_CONCRETE, roomBlocks); // west
+                }
+            }
+
+            // Large glass windows in south wall
+            for (int x = rx-3; x <= rx+3; x++) {
+                for (int y = ry+1; y <= ry+4; y++) {
+                    place(world, x, y, rz+W, Blocks.GLASS_PANE, roomBlocks);
+                }
+            }
+
+            // Also small windows on east and west walls
+            for (int y = ry+2; y <= ry+3; y++) {
+                place(world, rx+W, y, rz-2, Blocks.GLASS_PANE, roomBlocks);
+                place(world, rx+W, y, rz+2, Blocks.GLASS_PANE, roomBlocks);
+                place(world, rx-W, y, rz-2, Blocks.GLASS_PANE, roomBlocks);
+                place(world, rx-W, y, rz+2, Blocks.GLASS_PANE, roomBlocks);
+            }
+
+            // Hospital beds (white wool) in north corners — bigger beds
+            for (int dz = -6; dz <= -4; dz++) {
+                place(world, rx-5, ry,   rz+dz, Blocks.WHITE_WOOL, roomBlocks);
+                place(world, rx-4, ry,   rz+dz, Blocks.WHITE_WOOL, roomBlocks);
+                place(world, rx+5, ry,   rz+dz, Blocks.WHITE_WOOL, roomBlocks);
+                place(world, rx+4, ry,   rz+dz, Blocks.WHITE_WOOL, roomBlocks);
+            }
+            // Raised headboard
+            place(world, rx-5, ry+1, rz-6, Blocks.WHITE_WOOL, roomBlocks);
+            place(world, rx-4, ry+1, rz-6, Blocks.WHITE_WOOL, roomBlocks);
+            place(world, rx+5, ry+1, rz-6, Blocks.WHITE_WOOL, roomBlocks);
+            place(world, rx+4, ry+1, rz-6, Blocks.WHITE_WOOL, roomBlocks);
+
+            // Iron block medical equipment columns on east/west walls
             for (int y = ry; y <= ry+3; y++) {
-                for (int x = rx-4; x <= rx+4; x++) {
-                    place(world, x, y, rz-4, Blocks.WHITE_CONCRETE, roomBlocks); // north wall
-                    place(world, x, y, rz+4, Blocks.WHITE_CONCRETE, roomBlocks); // south wall
-                }
-                for (int z = rz-3; z <= rz+3; z++) {
-                    place(world, rx+4, y, z, Blocks.WHITE_CONCRETE, roomBlocks); // east wall
-                    place(world, rx-4, y, z, Blocks.WHITE_CONCRETE, roomBlocks); // west wall
-                }
+                place(world, rx+W, y, rz,   Blocks.IRON_BLOCK, roomBlocks);
+                place(world, rx-W, y, rz,   Blocks.IRON_BLOCK, roomBlocks);
+                place(world, rx+W, y, rz+4, Blocks.IRON_BLOCK, roomBlocks);
+                place(world, rx-W, y, rz+4, Blocks.IRON_BLOCK, roomBlocks);
             }
-
-            // Glass pane windows in south wall center (lets in sky light)
-            for (int x = rx-1; x <= rx+1; x++) {
-                place(world, x, ry+1, rz+4, Blocks.GLASS_PANE, roomBlocks);
-                place(world, x, ry+2, rz+4, Blocks.GLASS_PANE, roomBlocks);
-            }
-
-            // Hospital beds (white wool) in north corners
-            place(world, rx-3, ry,   rz-3, Blocks.WHITE_WOOL, roomBlocks);
-            place(world, rx-3, ry,   rz-2, Blocks.WHITE_WOOL, roomBlocks);
-            place(world, rx-3, ry+1, rz-3, Blocks.WHITE_WOOL, roomBlocks);
-            place(world, rx+3, ry,   rz-3, Blocks.WHITE_WOOL, roomBlocks);
-            place(world, rx+3, ry,   rz-2, Blocks.WHITE_WOOL, roomBlocks);
-            place(world, rx+3, ry+1, rz-3, Blocks.WHITE_WOOL, roomBlocks);
-
-            // Iron block "medical equipment" on east and west walls
-            place(world, rx+4, ry,   rz+1, Blocks.IRON_BLOCK, roomBlocks);
-            place(world, rx+4, ry+1, rz+1, Blocks.IRON_BLOCK, roomBlocks);
-            place(world, rx-4, ry,   rz+1, Blocks.IRON_BLOCK, roomBlocks);
-            place(world, rx-4, ry+1, rz+1, Blocks.IRON_BLOCK, roomBlocks);
 
             // TP player into the room, facing north (toward the villagers)
             player.networkHandler.requestTeleport(rx + 0.5, ry, rz + 0.5, 180f, 0f);
 
-            // Darkness for the whole cutscene
+            // Darkness + Slowness 255 (freezes movement) for the whole cutscene
             player.addStatusEffect(
                 new StatusEffectInstance(StatusEffects.DARKNESS, 380, 0, false, false));
+            player.addStatusEffect(
+                new StatusEffectInstance(StatusEffects.SLOWNESS, 380, 127, false, false));
 
             // Spawn villagers facing each other north of center
             // Doc432 — WEST side, facing EAST (toward Biotech)
