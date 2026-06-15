@@ -3,6 +3,8 @@ package com.pathogenesis.entity;
 import com.pathogenesis.init.ModEntities;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.ai.pathing.BirdNavigation;
+import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -12,6 +14,7 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 /**
@@ -47,6 +50,16 @@ public class RogueCellEntity extends HostileEntity {
      */
     public RogueCellEntity(EntityType<? extends RogueCellEntity> entityType, World world) {
         super(entityType, world);
+        this.setNoGravity(true);
+    }
+
+    @Override
+    protected EntityNavigation createNavigation(World world) {
+        BirdNavigation nav = new BirdNavigation(this, world);
+        nav.setCanPathThroughDoors(false);
+        nav.setCanEnterOpenDoors(false);
+        nav.setCanSwim(false);
+        return nav;
     }
 
     /**
@@ -92,9 +105,13 @@ public class RogueCellEntity extends HostileEntity {
     public void tick() {
         super.tick();
 
+        // Gentle hovering bob — sine wave on Y velocity
+        double bobVelocity = Math.sin(this.age * 0.05) * 0.03;
+        Vec3d vel = this.getVelocity();
+        this.setVelocity(vel.x, bobVelocity, vel.z);
+
         // Only refresh the glow on the server (not in the client's rendering thread)
         if (!this.getWorld().isClient() && this.age % GLOW_REFRESH_INTERVAL == 0) {
-            // Glowing effect lasts GLOW_REFRESH_INTERVAL + 20 ticks so it never flickers off
             this.addStatusEffect(
                 new StatusEffectInstance(StatusEffects.GLOWING, GLOW_REFRESH_INTERVAL + 20, 0, false, false)
             );
