@@ -12,6 +12,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
@@ -130,14 +131,15 @@ public class RogueCellEntity extends HostileEntity {
         // Priority 2: Wander around if it has no target
         this.goalSelector.add(2, new WanderAroundFarGoal(this, 0.8));
 
-        // Priority 3: Stare at nearby players (creepy effect)
-        this.goalSelector.add(3, new LookAtEntityGoal(this, PlayerEntity.class, 8.0f));
+        // Priority 3: Face target at all times
+        this.goalSelector.add(3, new LookAtEntityGoal(this, LivingEntity.class, 16.0f));
 
         // Priority 4: Randomly look around when idle
         this.goalSelector.add(4, new LookAroundGoal(this));
 
-        // Target selector: lock onto the nearest player within follow range
+        // Target selectors
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.add(2, new ActiveTargetGoal<>(this, VillagerEntity.class, true));
     }
 
     /**

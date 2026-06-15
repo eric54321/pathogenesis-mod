@@ -80,10 +80,13 @@ public class RogueCellModel extends EntityModel<RogueCellEntity> {
     public void setAngles(RogueCellEntity entity, float limbAngle, float limbDistance,
                           float animationProgress, float headYaw, float headPitch) {
         float spin = animationProgress * 0.8f;
+        float tiltYaw   = headYaw   * ((float)Math.PI / 180f) * 0.5f;
+        float tiltPitch = headPitch * ((float)Math.PI / 180f) * 0.5f;
 
         for (ModelPart p : new ModelPart[]{core, segN, segS, segE, segW,
                 segNE, segNW, segSE, segSW, innerNE, innerNW, innerSE, innerSW}) {
-            p.yaw = spin;
+            p.yaw   = spin + tiltYaw;
+            p.pitch = tiltPitch;
         }
 
         // Continuous slow wave so tentacles are always moving
