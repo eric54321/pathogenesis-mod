@@ -1,6 +1,5 @@
 package com.pathogenesis.entity;
 
-import com.pathogenesis.entity.TentacleProjectile;
 import com.pathogenesis.init.ModEntities;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -55,43 +54,43 @@ public class RogueCellEntity extends HostileEntity {
         this.setNoGravity(true);
     }
 
-    private void shootTentacle(LivingEntity target) {
-        TentacleProjectile tentacle = new TentacleProjectile(this.getWorld(), this);
-        double dx = target.getX() - this.getX();
-        double dy = target.getBodyY(0.3333) - tentacle.getY();
-        double dz = target.getZ() - this.getZ();
-        double dist = Math.sqrt(dx * dx + dz * dz);
-        tentacle.setVelocity(dx, dy + dist * 0.15, dz, 1.4f, 2.0f);
-        this.getWorld().spawnEntity(tentacle);
-    }
-
-    private static class ShootTentacleGoal extends Goal {
+    private static class LashGoal extends Goal {
         private final RogueCellEntity mob;
-        private final int cooldown;
-        private final float rangeSq;
-        private int timer;
+        private int timer = 60;
 
-        ShootTentacleGoal(RogueCellEntity mob, int cooldown, float range) {
-            this.mob = mob;
-            this.cooldown = cooldown;
-            this.rangeSq = range * range;
-        }
+        LashGoal(RogueCellEntity mob) { this.mob = mob; }
 
         @Override
-        public boolean canStart() {
-            return mob.getTarget() != null && mob.getTarget().squaredDistanceTo(mob) <= rangeSq;
-        }
+        public boolean canStart() { return true; }
+
+        @Override
+        public boolean shouldContinue() { return true; }
 
         @Override
         public void tick() {
             if (--timer <= 0) {
-                timer = cooldown;
-                mob.shootTentacle(mob.getTarget());
+                timer = 60;
+                if (!mob.getWorld().isClient()) {
+                    // Grab all players within 5 blocks and pull them in + apply effects
+                    mob.getWorld().getEntitiesByClass(PlayerEntity.class,
+                            mob.getBoundingBox().expand(5.0), p -> true)
+                        .forEach(player -> {
+                            player.damage(mob.getWorld().getDamageSources().mobAttack(mob), 6.0f);
+                            player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 2));
+                            player.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 80, 0));
+                            // Pull player toward the mob
+                            double dx = mob.getX() - player.getX();
+                            double dy = mob.getY() - player.getY();
+                            double dz = mob.getZ() - player.getZ();
+                            double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                            if (dist > 0.1) {
+                                player.setVelocity(player.getVelocity().add(
+                                    dx / dist * 0.6, dy / dist * 0.3, dz / dist * 0.6));
+                            }
+                        });
+                }
             }
         }
-
-        @Override
-        public void start() { timer = 10; }
     }
 
     @Override
@@ -125,8 +124,8 @@ public class RogueCellEntity extends HostileEntity {
      */
     @Override
     protected void initGoals() {
-        // Priority 1: Shoot tentacles at target (every 40 ticks, range 16 blocks)
-        this.goalSelector.add(1, new ShootTentacleGoal(this, 40, 16.0f));
+        // Priority 1: Lash tentacles every 3 seconds, grabbing players within 5 blocks
+        this.goalSelector.add(1, new LashGoal(this));
 
         // Priority 2: Wander around if it has no target
         this.goalSelector.add(2, new WanderAroundFarGoal(this, 0.8));
