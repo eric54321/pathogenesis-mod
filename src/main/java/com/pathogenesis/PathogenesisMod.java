@@ -95,7 +95,7 @@ public class PathogenesisMod implements ModInitializer {
                     player.networkHandler.sendPacket(new TitleS2CPacket(
                         Text.literal("Doc432").formatted(Formatting.AQUA, Formatting.BOLD)));
                     player.networkHandler.sendPacket(new SubtitleS2CPacket(
-                        Text.literal("Deploy the immune cells. NOW.").formatted(Formatting.YELLOW)));
+                        Text.literal("There's only one thing left to do.").formatted(Formatting.YELLOW)));
                     player.getWorld().playSound(null, player.getBlockPos(),
                         SoundEvents.ENTITY_VILLAGER_TRADE, SoundCategory.MASTER, 0.6f, 1.1f);
                 },
@@ -104,7 +104,7 @@ public class PathogenesisMod implements ModInitializer {
                     player.networkHandler.sendPacket(new TitleS2CPacket(
                         Text.literal("Biotech92130").formatted(Formatting.GREEN, Formatting.BOLD)));
                     player.networkHandler.sendPacket(new SubtitleS2CPacket(
-                        Text.literal("Initiating cellular defense protocol...").formatted(Formatting.WHITE)));
+                        Text.literal("I'm going in.").formatted(Formatting.WHITE)));
                     player.getWorld().playSound(null, player.getBlockPos(),
                         SoundEvents.ENTITY_VILLAGER_WORK_CARTOGRAPHER, SoundCategory.MASTER, 0.6f, 0.85f);
                 },
