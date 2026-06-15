@@ -20,9 +20,17 @@ public class BossArena {
     private static BlockPos arenaCenter = null;
     private static boolean bossAlive = false;
     private static int checkTimer = 0;
+    private static MinecraftServer currentServer = null;
 
     public static BlockPos getArenaCenter() { return arenaCenter; }
-    public static void setBossDefeated() { bossAlive = false; }
+
+    public static void setBossDefeated() {
+        bossAlive = false;
+        if (currentServer != null) {
+            ArenaPersistentState state = ArenaPersistentState.getOrCreate(currentServer.getOverworld());
+            state.setBossDefeated(true);
+        }
+    }
 
     public static void register() {
         ServerLifecycleEvents.SERVER_STARTED.register(BossArena::onServerStart);
@@ -30,8 +38,11 @@ public class BossArena {
     }
 
     private static void onServerStart(MinecraftServer server) {
+        currentServer = server;
         ServerWorld world = server.getOverworld();
         ArenaPersistentState state = ArenaPersistentState.getOrCreate(world);
+        // Restore defeated flag across restarts
+        if (state.isBossDefeated()) bossAlive = true;
         if (!state.isBuilt()) {
             BlockPos spawn = world.getSpawnPos();
             int x = spawn.getX();
