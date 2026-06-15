@@ -5,6 +5,7 @@ import com.pathogenesis.entity.CoronavirusEntity;
 import com.pathogenesis.entity.InfluenzaEntity;
 import com.pathogenesis.entity.PhageEntity;
 import com.pathogenesis.entity.RogueCellEntity;
+import com.pathogenesis.entity.TentacleProjectile;
 import com.pathogenesis.entity.VironEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.entity.EntityType;
@@ -79,6 +80,14 @@ public class ModEntities {
         Identifier.of(PathogenesisMod.MOD_ID, "phage"),
         EntityType.Builder.create(PhageEntity::new, SpawnGroup.MONSTER)
             .dimensions(0.6f, 1.2f)
+            .build()
+    );
+
+    public static final EntityType<TentacleProjectile> TENTACLE = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(PathogenesisMod.MOD_ID, "tentacle"),
+        EntityType.Builder.<TentacleProjectile>create(TentacleProjectile::new, SpawnGroup.MISC)
+            .dimensions(0.3f, 0.3f)
             .build()
     );
 

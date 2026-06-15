@@ -4,6 +4,7 @@ import com.pathogenesis.entity.model.PhageModel;
 import com.pathogenesis.entity.model.RogueCellModel;
 import com.pathogenesis.entity.model.VironModel;
 import com.pathogenesis.entity.renderer.CoronavirusRenderer;
+import com.pathogenesis.entity.renderer.TentacleRenderer;
 import com.pathogenesis.entity.renderer.InfluenzaRenderer;
 import com.pathogenesis.entity.renderer.PhageRenderer;
 import com.pathogenesis.entity.renderer.RogueCellRenderer;
@@ -37,6 +38,9 @@ public class PathogenesisModClient implements ClientModInitializer {
         // Phage — alien lander shape with icosahedral head, tail shaft, and 4 landing legs
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.PHAGE, PhageModel::getTexturedModelData);
         EntityRendererRegistry.register(ModEntities.PHAGE, PhageRenderer::new);
+
+        // Tentacle projectile
+        EntityRendererRegistry.register(ModEntities.TENTACLE, TentacleRenderer::new);
 
         PathogenesisMod.LOGGER.info("Pathogenesis client initialized.");
     }

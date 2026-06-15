@@ -1,7 +1,9 @@
 package com.pathogenesis.entity;
 
+import com.pathogenesis.entity.TentacleProjectile;
 import com.pathogenesis.init.ModEntities;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.BirdNavigation;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
@@ -53,6 +55,45 @@ public class RogueCellEntity extends HostileEntity {
         this.setNoGravity(true);
     }
 
+    private void shootTentacle(LivingEntity target) {
+        TentacleProjectile tentacle = new TentacleProjectile(this.getWorld(), this);
+        double dx = target.getX() - this.getX();
+        double dy = target.getBodyY(0.3333) - tentacle.getY();
+        double dz = target.getZ() - this.getZ();
+        double dist = Math.sqrt(dx * dx + dz * dz);
+        tentacle.setVelocity(dx, dy + dist * 0.15, dz, 1.4f, 2.0f);
+        this.getWorld().spawnEntity(tentacle);
+    }
+
+    private static class ShootTentacleGoal extends Goal {
+        private final RogueCellEntity mob;
+        private final int cooldown;
+        private final float rangeSq;
+        private int timer;
+
+        ShootTentacleGoal(RogueCellEntity mob, int cooldown, float range) {
+            this.mob = mob;
+            this.cooldown = cooldown;
+            this.rangeSq = range * range;
+        }
+
+        @Override
+        public boolean canStart() {
+            return mob.getTarget() != null && mob.getTarget().squaredDistanceTo(mob) <= rangeSq;
+        }
+
+        @Override
+        public void tick() {
+            if (--timer <= 0) {
+                timer = cooldown;
+                mob.shootTentacle(mob.getTarget());
+            }
+        }
+
+        @Override
+        public void start() { timer = 10; }
+    }
+
     @Override
     protected EntityNavigation createNavigation(World world) {
         BirdNavigation nav = new BirdNavigation(this, world);
@@ -84,8 +125,8 @@ public class RogueCellEntity extends HostileEntity {
      */
     @Override
     protected void initGoals() {
-        // Priority 1: Attack the target it has found
-        this.goalSelector.add(1, new MeleeAttackGoal(this, 1.0, true));
+        // Priority 1: Shoot tentacles at target (every 40 ticks, range 16 blocks)
+        this.goalSelector.add(1, new ShootTentacleGoal(this, 40, 16.0f));
 
         // Priority 2: Wander around if it has no target
         this.goalSelector.add(2, new WanderAroundFarGoal(this, 0.8));
