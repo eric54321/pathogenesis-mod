@@ -2,6 +2,7 @@ package com.pathogenesis;
 
 import com.pathogenesis.init.ModEntities;
 import com.pathogenesis.init.ModItems;
+import com.pathogenesis.system.HostHealth;
 import com.pathogenesis.system.WaveSpawner;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
@@ -32,6 +33,9 @@ public class PathogenesisMod implements ModInitializer {
 
         // Register the wave spawner tick event so waves fire every 2 minutes
         WaveSpawner.register();
+
+        // Register host health system (boss bar + join message + game over)
+        HostHealth.register();
 
         LOGGER.info("Pathogenesis mod ready. Pathogens incoming!");
     }

@@ -1,6 +1,7 @@
 package com.pathogenesis.system;
 
 import com.pathogenesis.PathogenesisMod;
+import com.pathogenesis.system.HostHealth;
 import com.pathogenesis.entity.CoronavirusEntity;
 import com.pathogenesis.entity.AscariEntity;
 import com.pathogenesis.entity.DermatophyteEntity;
@@ -46,6 +47,9 @@ public class WaveSpawner {
 
     /** 20 ticks per second x 60 seconds x 2 minutes = 2400 ticks between waves */
     private static final int WAVE_INTERVAL_TICKS = 20 * 60 * 2;
+
+    /** Survive this many waves to win */
+    private static final int FINAL_WAVE = 10;
 
     /** Minimum enemies per wave regardless of player count */
     private static final int BASE_ENEMIES = 5;
@@ -142,6 +146,12 @@ public class WaveSpawner {
 
         // Spawn the enemies distributed among the players
         spawnEnemies(server, players, enemyCount);
+
+        if (waveNumber >= FINAL_WAVE) {
+            HostHealth.triggerVictory(server);
+            waveNumber = 0;
+            ticksUntilNextWave = WAVE_INTERVAL_TICKS;
+        }
     }
 
     /**
