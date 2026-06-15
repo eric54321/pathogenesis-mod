@@ -37,38 +37,38 @@ public class BacteriumBossModel extends EntityModel<BacteriumBossEntity> {
         ModelData md = new ModelData();
         ModelPartData r = md.getRoot();
 
-        // Main rod body: 20 wide, 20 tall, 36 long — massive elongated bacillus
-        // Pivot at (0, -8, 0) so the huge body sits above ground
+        // Main rod body: 32 wide, 32 tall, 56 long — titanic bacillus
+        // Pivot at (0, -24, 0) so the body sits above ground
         r.addChild("body",
-            ModelPartBuilder.create().uv(0, 0).cuboid(-10f, -10f, -18f, 20, 20, 36),
-            ModelTransform.pivot(0f, -8f, 0f));
+            ModelPartBuilder.create().uv(0, 0).cuboid(-16f, -16f, -28f, 32, 32, 56),
+            ModelTransform.pivot(0f, -24f, 0f));
 
         // Rounded north cap
         r.addChild("cap_north",
-            ModelPartBuilder.create().uv(0, 28).cuboid(-8f, -8f, -26f, 16, 16, 8),
-            ModelTransform.pivot(0f, -8f, 0f));
+            ModelPartBuilder.create().uv(0, 28).cuboid(-12f, -12f, -40f, 24, 24, 12),
+            ModelTransform.pivot(0f, -24f, 0f));
 
         // Rounded south cap
         r.addChild("cap_south",
-            ModelPartBuilder.create().uv(24, 28).cuboid(-8f, -8f, 18f, 16, 16, 8),
-            ModelTransform.pivot(0f, -8f, 0f));
+            ModelPartBuilder.create().uv(24, 28).cuboid(-12f, -12f, 28f, 24, 24, 12),
+            ModelTransform.pivot(0f, -24f, 0f));
 
-        // 4 huge flagella — thick whip-like appendages from the south end
+        // 4 massive flagella
         r.addChild("flag1",
-            ModelPartBuilder.create().uv(0, 40).cuboid(-2f, -2f, -30f, 4, 4, 30),
-            ModelTransform.of(0f, -8f, 18f, 0f, 0f, 0.5f));
+            ModelPartBuilder.create().uv(0, 40).cuboid(-3f, -3f, -48f, 6, 6, 48),
+            ModelTransform.of(0f, -24f, 28f, 0f, 0f, 0.5f));
 
         r.addChild("flag2",
-            ModelPartBuilder.create().uv(0, 40).cuboid(-2f, -2f, -30f, 4, 4, 30),
-            ModelTransform.of(0f, -8f, 18f, 0f, (float)(Math.PI / 2), 0.5f));
+            ModelPartBuilder.create().uv(0, 40).cuboid(-3f, -3f, -48f, 6, 6, 48),
+            ModelTransform.of(0f, -24f, 28f, 0f, (float)(Math.PI / 2), 0.5f));
 
         r.addChild("flag3",
-            ModelPartBuilder.create().uv(0, 40).cuboid(-2f, -2f, -30f, 4, 4, 30),
-            ModelTransform.of(0f, -8f, 18f, 0f, (float)Math.PI, 0.5f));
+            ModelPartBuilder.create().uv(0, 40).cuboid(-3f, -3f, -48f, 6, 6, 48),
+            ModelTransform.of(0f, -24f, 28f, 0f, (float)Math.PI, 0.5f));
 
         r.addChild("flag4",
-            ModelPartBuilder.create().uv(0, 40).cuboid(-2f, -2f, -30f, 4, 4, 30),
-            ModelTransform.of(0f, -8f, 18f, 0f, (float)(3 * Math.PI / 2), 0.5f));
+            ModelPartBuilder.create().uv(0, 40).cuboid(-3f, -3f, -48f, 6, 6, 48),
+            ModelTransform.of(0f, -24f, 28f, 0f, (float)(3 * Math.PI / 2), 0.5f));
 
         return TexturedModelData.of(md, 64, 64);
     }

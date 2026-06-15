@@ -156,7 +156,7 @@ public class ModEntities {
         Registries.ENTITY_TYPE,
         Identifier.of(PathogenesisMod.MOD_ID, "bacterium_boss"),
         EntityType.Builder.create(BacteriumBossEntity::new, SpawnGroup.MONSTER)
-            .dimensions(4.0f, 5.0f)
+            .dimensions(7.0f, 9.0f)
             .build()
     );
 

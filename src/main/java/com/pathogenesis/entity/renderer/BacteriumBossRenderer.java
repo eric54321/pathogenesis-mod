@@ -15,7 +15,7 @@ public class BacteriumBossRenderer extends MobEntityRenderer<BacteriumBossEntity
         Identifier.of("pathogenesis", "textures/entity/bacterium_boss_p2.png");
 
     public BacteriumBossRenderer(EntityRendererFactory.Context context) {
-        super(context, new BacteriumBossModel(context.getPart(ModModelLayers.BACTERIUM_BOSS)), 3.5f);
+        super(context, new BacteriumBossModel(context.getPart(ModModelLayers.BACTERIUM_BOSS)), 6.0f);
     }
 
     @Override
