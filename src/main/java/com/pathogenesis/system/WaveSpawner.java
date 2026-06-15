@@ -112,6 +112,25 @@ public class WaveSpawner {
             // Reset the timer BEFORE spawning so lag during spawning doesn't shorten the next interval
             ticksUntilNextWave = WAVE_INTERVAL_TICKS;
             triggerWave(server);
+        } else {
+            // Update the action bar countdown every second (every 20 ticks)
+            if (ticksUntilNextWave % 20 == 0) {
+                sendCountdown(server);
+            }
+        }
+    }
+
+    private static void sendCountdown(MinecraftServer server) {
+        int secondsLeft = ticksUntilNextWave / 20;
+        int minutes = secondsLeft / 60;
+        int seconds = secondsLeft % 60;
+        String timeStr = String.format("%d:%02d", minutes, seconds);
+
+        Formatting color = secondsLeft <= 30 ? Formatting.RED : Formatting.GREEN;
+        Text msg = Text.literal("Wave " + (waveNumber + 1) + " in " + timeStr).formatted(color);
+
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            player.sendMessage(msg, true); // true = action bar (above hotbar)
         }
     }
 
