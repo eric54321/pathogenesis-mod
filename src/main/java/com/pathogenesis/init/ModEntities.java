@@ -1,6 +1,7 @@
 package com.pathogenesis.init;
 
 import com.pathogenesis.PathogenesisMod;
+import com.pathogenesis.entity.InfluenzaEntity;
 import com.pathogenesis.entity.RogueCellEntity;
 import com.pathogenesis.entity.VironEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -43,6 +44,18 @@ public class ModEntities {
     );
 
     /**
+     * Influenza — flu virus, extends Viron. Causes Nausea + Slowness on hit.
+     * Slightly larger and slower than a generic Viron.
+     */
+    public static final EntityType<InfluenzaEntity> INFLUENZA = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(PathogenesisMod.MOD_ID, "influenza"),
+        EntityType.Builder.create(InfluenzaEntity::new, SpawnGroup.MONSTER)
+            .dimensions(0.5f, 0.5f)
+            .build()
+    );
+
+    /**
      * Called from PathogenesisMod.onInitialize().
      * Registers entity attribute sets (health, speed, damage) for each mob.
      * Without this call the game will crash when the entity tries to spawn.
@@ -50,6 +63,7 @@ public class ModEntities {
     public static void register() {
         FabricDefaultAttributeRegistry.register(ROGUE_CELL, RogueCellEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(VIRON, VironEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(INFLUENZA, InfluenzaEntity.createAttributes());
 
         PathogenesisMod.LOGGER.info("Pathogenesis entities registered.");
     }

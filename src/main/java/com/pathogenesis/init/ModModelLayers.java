@@ -9,4 +9,7 @@ public class ModModelLayers {
 
     public static final EntityModelLayer VIRON =
         new EntityModelLayer(Identifier.of("pathogenesis", "viron"), "main");
+
+    public static final EntityModelLayer INFLUENZA =
+        new EntityModelLayer(Identifier.of("pathogenesis", "influenza"), "main");
 }
