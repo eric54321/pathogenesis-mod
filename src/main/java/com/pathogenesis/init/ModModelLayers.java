@@ -6,4 +6,7 @@ import net.minecraft.util.Identifier;
 public class ModModelLayers {
     public static final EntityModelLayer ROGUE_CELL =
         new EntityModelLayer(Identifier.of("pathogenesis", "rogue_cell"), "main");
+
+    public static final EntityModelLayer VIRON =
+        new EntityModelLayer(Identifier.of("pathogenesis", "viron"), "main");
 }
