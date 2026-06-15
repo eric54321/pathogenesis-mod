@@ -1,6 +1,7 @@
 package com.pathogenesis.init;
 
 import com.pathogenesis.PathogenesisMod;
+import com.pathogenesis.item.AnthraxBladeItem;
 import com.pathogenesis.item.CARTInjectorItem;
 import com.pathogenesis.item.PathogenTrackerItem;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -28,6 +29,12 @@ public class ModItems {
         new CARTInjectorItem(new Item.Settings().maxCount(1))
     );
 
+    public static final AnthraxBladeItem ANTHRAX_BLADE = Registry.register(
+        Registries.ITEM,
+        Identifier.of(PathogenesisMod.MOD_ID, "anthrax_blade"),
+        new AnthraxBladeItem(new Item.Settings().maxCount(1))
+    );
+
     public static final PathogenTrackerItem PATHOGEN_TRACKER = Registry.register(
         Registries.ITEM,
         Identifier.of(PathogenesisMod.MOD_ID, "pathogen_tracker"),
@@ -44,6 +51,7 @@ public class ModItems {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> {
             entries.add(CART_INJECTOR);
             entries.add(PATHOGEN_TRACKER);
+            entries.add(ANTHRAX_BLADE);
         });
 
         PathogenesisMod.LOGGER.info("Pathogenesis items registered.");

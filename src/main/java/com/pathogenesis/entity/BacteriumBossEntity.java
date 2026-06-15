@@ -1,5 +1,7 @@
 package com.pathogenesis.entity;
 
+import com.pathogenesis.init.ModItems;
+import com.pathogenesis.system.BossArena;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
@@ -459,5 +461,11 @@ public class BacteriumBossEntity extends HostileEntity {
     public void onDeath(DamageSource source) {
         super.onDeath(source);
         this.bossBar.clearPlayers();
+        BossArena.setBossDefeated();
+
+        // Drop the Anthrax Blade at the boss's position
+        if (!this.getWorld().isClient()) {
+            this.dropStack(new net.minecraft.item.ItemStack(ModItems.ANTHRAX_BLADE));
+        }
     }
 }
