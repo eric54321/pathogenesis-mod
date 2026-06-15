@@ -37,39 +37,38 @@ public class BacteriumBossModel extends EntityModel<BacteriumBossEntity> {
         ModelData md = new ModelData();
         ModelPartData r = md.getRoot();
 
-        // Main rod body: 10 wide, 10 tall, 18 long — elongated bacillus shape
-        // Pivot at (0, 14, 0) so the bottom of the body is near ground (y=24)
+        // Main rod body: 20 wide, 20 tall, 36 long — massive elongated bacillus
+        // Pivot at (0, -8, 0) so the huge body sits above ground
         r.addChild("body",
-            ModelPartBuilder.create().uv(0, 0).cuboid(-5f, -5f, -9f, 10, 10, 18),
-            ModelTransform.pivot(0f, 14f, 0f));
+            ModelPartBuilder.create().uv(0, 0).cuboid(-10f, -10f, -18f, 20, 20, 36),
+            ModelTransform.pivot(0f, -8f, 0f));
 
-        // Rounded north cap: 8x8x4 cap at the north end of the rod
+        // Rounded north cap
         r.addChild("cap_north",
-            ModelPartBuilder.create().uv(0, 28).cuboid(-4f, -4f, -13f, 8, 8, 4),
-            ModelTransform.pivot(0f, 14f, 0f));
+            ModelPartBuilder.create().uv(0, 28).cuboid(-8f, -8f, -26f, 16, 16, 8),
+            ModelTransform.pivot(0f, -8f, 0f));
 
-        // Rounded south cap: 8x8x4 cap at the south end of the rod
+        // Rounded south cap
         r.addChild("cap_south",
-            ModelPartBuilder.create().uv(24, 28).cuboid(-4f, -4f, 9f, 8, 8, 4),
-            ModelTransform.pivot(0f, 14f, 0f));
+            ModelPartBuilder.create().uv(24, 28).cuboid(-8f, -8f, 18f, 16, 16, 8),
+            ModelTransform.pivot(0f, -8f, 0f));
 
-        // 4 flagella — thin whip-like appendages from the south end, angled outward
-        // They extend in the -Z direction so yaw rotation spreads them around
+        // 4 huge flagella — thick whip-like appendages from the south end
         r.addChild("flag1",
-            ModelPartBuilder.create().uv(0, 40).cuboid(-1f, -1f, -16f, 2, 2, 16),
-            ModelTransform.of(0f, 14f, 9f, 0f, 0f, 0.5f));
+            ModelPartBuilder.create().uv(0, 40).cuboid(-2f, -2f, -30f, 4, 4, 30),
+            ModelTransform.of(0f, -8f, 18f, 0f, 0f, 0.5f));
 
         r.addChild("flag2",
-            ModelPartBuilder.create().uv(0, 40).cuboid(-1f, -1f, -16f, 2, 2, 16),
-            ModelTransform.of(0f, 14f, 9f, 0f, (float)(Math.PI / 2), 0.5f));
+            ModelPartBuilder.create().uv(0, 40).cuboid(-2f, -2f, -30f, 4, 4, 30),
+            ModelTransform.of(0f, -8f, 18f, 0f, (float)(Math.PI / 2), 0.5f));
 
         r.addChild("flag3",
-            ModelPartBuilder.create().uv(0, 40).cuboid(-1f, -1f, -16f, 2, 2, 16),
-            ModelTransform.of(0f, 14f, 9f, 0f, (float)Math.PI, 0.5f));
+            ModelPartBuilder.create().uv(0, 40).cuboid(-2f, -2f, -30f, 4, 4, 30),
+            ModelTransform.of(0f, -8f, 18f, 0f, (float)Math.PI, 0.5f));
 
         r.addChild("flag4",
-            ModelPartBuilder.create().uv(0, 40).cuboid(-1f, -1f, -16f, 2, 2, 16),
-            ModelTransform.of(0f, 14f, 9f, 0f, (float)(3 * Math.PI / 2), 0.5f));
+            ModelPartBuilder.create().uv(0, 40).cuboid(-2f, -2f, -30f, 4, 4, 30),
+            ModelTransform.of(0f, -8f, 18f, 0f, (float)(3 * Math.PI / 2), 0.5f));
 
         return TexturedModelData.of(md, 64, 64);
     }
@@ -94,10 +93,10 @@ public class BacteriumBossModel extends EntityModel<BacteriumBossEntity> {
         body.yaw     = headYaw * ((float)Math.PI / 180f);
         capNorth.yaw = body.yaw;
         capSouth.yaw = body.yaw;
-        flag1.yaw    = body.yaw;
-        flag2.yaw    = body.yaw + (float)(Math.PI / 2);
-        flag3.yaw    = body.yaw + (float)Math.PI;
-        flag4.yaw    = body.yaw + (float)(3 * Math.PI / 2);
+        flag1.yaw = body.yaw;
+        flag2.yaw = body.yaw + (float)(Math.PI / 2);
+        flag3.yaw = body.yaw + (float)Math.PI;
+        flag4.yaw = body.yaw + (float)(3 * Math.PI / 2);
     }
 
     @Override
