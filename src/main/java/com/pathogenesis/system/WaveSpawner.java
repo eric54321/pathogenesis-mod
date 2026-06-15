@@ -2,6 +2,7 @@ package com.pathogenesis.system;
 
 import com.pathogenesis.PathogenesisMod;
 import com.pathogenesis.system.HostHealth;
+import com.pathogenesis.system.StageAmbience;
 import com.pathogenesis.entity.CoronavirusEntity;
 import com.pathogenesis.entity.AscariEntity;
 import com.pathogenesis.entity.DermatophyteEntity;
@@ -87,6 +88,7 @@ public class WaveSpawner {
      */
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(WaveSpawner::onServerTick);
+        ServerTickEvents.END_SERVER_TICK.register(StageAmbience::tick);
         PathogenesisMod.LOGGER.info("WaveSpawner registered. First wave in 2 minutes.");
     }
 
@@ -332,6 +334,7 @@ public class WaveSpawner {
     public static void reset() {
         waveNumber = 0;
         ticksUntilNextWave = WAVE_INTERVAL_TICKS;
+        StageAmbience.reset();
         PathogenesisMod.LOGGER.info("WaveSpawner reset. Game restarting.");
     }
 }
