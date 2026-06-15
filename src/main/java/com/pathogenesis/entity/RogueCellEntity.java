@@ -32,10 +32,10 @@ import net.minecraft.world.World;
 public class RogueCellEntity extends HostileEntity {
 
     // Full-size Rogue Cell has 20 HP
-    private static final double FULL_HEALTH = 20.0;
+    private static final double FULL_HEALTH = 50.0;
 
     // Split copies get half the health — they are weaker but still dangerous
-    private static final double SPLIT_HEALTH = 10.0;
+    private static final double SPLIT_HEALTH = 25.0;
 
     // Number of ticks between glowing effect refreshes (100 ticks = 5 seconds)
     private static final int GLOW_REFRESH_INTERVAL = 100;
@@ -70,9 +70,9 @@ public class RogueCellEntity extends HostileEntity {
     public static DefaultAttributeContainer.Builder createAttributes() {
         return HostileEntity.createHostileAttributes()
             .add(EntityAttributes.GENERIC_MAX_HEALTH, FULL_HEALTH)
-            .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.28)   // Slightly slower than a zombie
-            .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 3.0)     // Deals 1.5 hearts per hit
-            .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 24.0);    // Detects players from 24 blocks
+            .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.38)
+            .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 8.0)
+            .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0);
     }
 
     /**
