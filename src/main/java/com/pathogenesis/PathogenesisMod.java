@@ -226,13 +226,15 @@ public class PathogenesisMod implements ModInitializer {
                 scheduleAt(server, delays[i], line);
             }
 
-            // After the PATHOGENESIS title fades out: remove the room and TP player back
+            // After the PATHOGENESIS title fades out: remove the room and TP player to world spawn
             scheduleAt(server, 355, () -> {
                 if (!player.isAlive()) return;
                 for (BlockPos pos : roomBlocks) {
                     world.setBlockState(pos, Blocks.AIR.getDefaultState(), 2);
                 }
-                player.networkHandler.requestTeleport(origX, origY, origZ, origYaw, origPitch);
+                BlockPos spawnPos = world.getSpawnPos();
+                player.networkHandler.requestTeleport(
+                    spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5, 0f, 0f);
             });
         });
 
