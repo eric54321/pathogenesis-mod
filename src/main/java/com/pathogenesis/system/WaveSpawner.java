@@ -13,6 +13,7 @@ import com.pathogenesis.entity.PhageEntity;
 import com.pathogenesis.entity.RogueCellEntity;
 import com.pathogenesis.entity.StaphEntity;
 import com.pathogenesis.entity.StreptococcusEntity;
+import com.pathogenesis.entity.BacteriumBossEntity;
 import com.pathogenesis.entity.VironEntity;
 import com.pathogenesis.init.ModEntities;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -152,6 +153,26 @@ public class WaveSpawner {
         List<ServerPlayerEntity> players = server.getPlayerManager().getPlayerList();
         int playerCount = players.size();
 
+        // Wave 10: boss wave — spawn the Bacterium Boss instead of normal enemies
+        if (waveNumber == FINAL_WAVE) {
+            broadcastBossAlert(server);
+            ServerPlayerEntity target = players.get(0);
+            ServerWorld world = target.getServerWorld();
+            double angle = Math.random() * 2.0 * Math.PI;
+            double spawnX = target.getX() + Math.cos(angle) * 15;
+            double spawnZ = target.getZ() + Math.sin(angle) * 15;
+            double spawnY = world.getTopY(
+                net.minecraft.world.Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+                (int) spawnX, (int) spawnZ);
+            BacteriumBossEntity boss = new BacteriumBossEntity(ModEntities.BACTERIUM_BOSS, world);
+            boss.refreshPositionAndAngles(spawnX, spawnY, spawnZ, 0, 0);
+            world.spawnEntity(boss);
+            HostHealth.triggerVictory(server);
+            waveNumber = 0;
+            ticksUntilNextWave = WAVE_INTERVAL_TICKS;
+            return;
+        }
+
         // Calculate total enemies for this wave using the scaling formula
         int enemyCount = BASE_ENEMIES
             + (playerCount * ENEMIES_PER_PLAYER)
@@ -168,11 +189,6 @@ public class WaveSpawner {
         // Spawn the enemies distributed among the players
         spawnEnemies(server, players, enemyCount);
 
-        if (waveNumber >= FINAL_WAVE) {
-            HostHealth.triggerVictory(server);
-            waveNumber = 0;
-            ticksUntilNextWave = WAVE_INTERVAL_TICKS;
-        }
     }
 
     /**
@@ -182,6 +198,13 @@ public class WaveSpawner {
      * @param server      The running Minecraft server instance
      * @param enemyCount  Total number of enemies that will spawn this wave
      */
+    private static void broadcastBossAlert(MinecraftServer server) {
+        Text message = Text.literal(
+            "☠ WAVE 10 — BACILLUS ANTHRACIS HAS EMERGED! ☠"
+        ).formatted(Formatting.DARK_GREEN, Formatting.BOLD);
+        server.getPlayerManager().broadcast(message, false);
+    }
+
     private static void broadcastWaveAlert(MinecraftServer server, int enemyCount) {
         Text message = Text.literal(
             "⚠ WAVE " + waveNumber + " INCOMING! " + enemyCount + " pathogens detected! ⚠"

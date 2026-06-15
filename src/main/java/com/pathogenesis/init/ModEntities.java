@@ -2,6 +2,7 @@ package com.pathogenesis.init;
 
 import com.pathogenesis.PathogenesisMod;
 import com.pathogenesis.entity.AscariEntity;
+import com.pathogenesis.entity.BacteriumBossEntity;
 import com.pathogenesis.entity.CoronavirusEntity;
 import com.pathogenesis.entity.DermatophyteEntity;
 import com.pathogenesis.entity.InfluenzaEntity;
@@ -147,6 +148,18 @@ public class ModEntities {
             .build()
     );
 
+    /**
+     * Bacterium Boss — Bacillus anthracis, the final wave 10 boss.
+     * Massive, slow, 200 HP tank with a boss health bar and AoE acid stomp.
+     */
+    public static final EntityType<BacteriumBossEntity> BACTERIUM_BOSS = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(PathogenesisMod.MOD_ID, "bacterium_boss"),
+        EntityType.Builder.create(BacteriumBossEntity::new, SpawnGroup.MONSTER)
+            .dimensions(2.0f, 2.2f)
+            .build()
+    );
+
     /** Strongyloides — threadworm. Adults spawn larvae; both grow. Kill the adult first. */
     public static final EntityType<StrongyloideEntity> STRONGYLOIDE = Registry.register(
         Registries.ENTITY_TYPE,
@@ -170,6 +183,7 @@ public class ModEntities {
         FabricDefaultAttributeRegistry.register(STAPH, StaphEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(STREPTOCOCCUS, StreptococcusEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(DERMATOPHYTE, DermatophyteEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(BACTERIUM_BOSS, BacteriumBossEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(ASCARI, AscariEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(TAENIA, TaeniaEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(STRONGYLOIDE, StrongyloideEntity.createAttributes());

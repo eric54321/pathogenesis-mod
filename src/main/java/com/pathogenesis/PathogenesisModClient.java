@@ -1,6 +1,8 @@
 package com.pathogenesis;
 
 import com.pathogenesis.entity.model.AscariModel;
+import com.pathogenesis.entity.model.BacteriumBossModel;
+import com.pathogenesis.entity.renderer.BacteriumBossRenderer;
 import com.pathogenesis.entity.model.DermatophyteModel;
 import com.pathogenesis.entity.model.StrongyloideModel;
 import com.pathogenesis.entity.model.TaeniaModel;
@@ -73,6 +75,10 @@ public class PathogenesisModClient implements ClientModInitializer {
 
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.STRONGYLOIDE, StrongyloideModel::getTexturedModelData);
         EntityRendererRegistry.register(ModEntities.STRONGYLOIDE, StrongyloideRenderer::new);
+
+        // Bacterium Boss — final wave 10 boss
+        EntityModelLayerRegistry.registerModelLayer(ModModelLayers.BACTERIUM_BOSS, BacteriumBossModel::getTexturedModelData);
+        EntityRendererRegistry.register(ModEntities.BACTERIUM_BOSS, BacteriumBossRenderer::new);
 
         PathogenesisMod.LOGGER.info("Pathogenesis client initialized.");
     }

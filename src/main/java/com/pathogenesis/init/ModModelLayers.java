@@ -36,4 +36,7 @@ public class ModModelLayers {
 
     public static final EntityModelLayer STRONGYLOIDE =
         new EntityModelLayer(Identifier.of("pathogenesis", "strongyloide"), "main");
+
+    public static final EntityModelLayer BACTERIUM_BOSS =
+        new EntityModelLayer(Identifier.of("pathogenesis", "bacterium_boss"), "main");
 }

@@ -170,9 +170,9 @@ public class PathogenesisMod implements ModInitializer {
 
             // Darkness + Slowness 255 (freezes movement) for the whole cutscene
             player.addStatusEffect(
-                new StatusEffectInstance(StatusEffects.DARKNESS, 380, 0, false, false));
+                new StatusEffectInstance(StatusEffects.DARKNESS, 620, 0, false, false));
             player.addStatusEffect(
-                new StatusEffectInstance(StatusEffects.SLOWNESS, 380, 127, false, false));
+                new StatusEffectInstance(StatusEffects.SLOWNESS, 620, 127, false, false));
 
             // Spawn villagers facing each other north of center
             // Doc432 — WEST side, facing EAST (toward Biotech)
@@ -197,7 +197,7 @@ public class PathogenesisMod implements ModInitializer {
             bio.setYaw(90f); bio.setBodyYaw(90f); bio.setHeadYaw(90f); // face west
             world.spawnEntity(bio);
 
-            // Dialogue lines
+            // Dialogue lines — each shown for ~55 ticks (~2.75 seconds)
             Runnable[] lines = {
                 () -> {
                     player.networkHandler.sendPacket(new TitleFadeS2CPacket(5, 45, 5));
@@ -222,7 +222,25 @@ public class PathogenesisMod implements ModInitializer {
                     player.networkHandler.sendPacket(new TitleS2CPacket(
                         Text.literal("Doc432").formatted(Formatting.AQUA, Formatting.BOLD)));
                     player.networkHandler.sendPacket(new SubtitleS2CPacket(
-                        Text.literal("There's only one thing left to do.").formatted(Formatting.YELLOW)));
+                        Text.literal("We've tried everything. Nothing is working.").formatted(Formatting.WHITE)));
+                    world.playSound(null, player.getBlockPos(),
+                        SoundEvents.ENTITY_VILLAGER_AMBIENT, SoundCategory.MASTER, 0.8f, 1.0f);
+                },
+                () -> {
+                    player.networkHandler.sendPacket(new TitleFadeS2CPacket(5, 45, 5));
+                    player.networkHandler.sendPacket(new TitleS2CPacket(
+                        Text.literal("Biotech92130").formatted(Formatting.GREEN, Formatting.BOLD)));
+                    player.networkHandler.sendPacket(new SubtitleS2CPacket(
+                        Text.literal("The host won't survive another hour at this rate.").formatted(Formatting.WHITE)));
+                    world.playSound(null, player.getBlockPos(),
+                        SoundEvents.ENTITY_VILLAGER_AMBIENT, SoundCategory.MASTER, 0.8f, 0.85f);
+                },
+                () -> {
+                    player.networkHandler.sendPacket(new TitleFadeS2CPacket(5, 55, 5));
+                    player.networkHandler.sendPacket(new TitleS2CPacket(
+                        Text.literal("Doc432").formatted(Formatting.AQUA, Formatting.BOLD)));
+                    player.networkHandler.sendPacket(new SubtitleS2CPacket(
+                        Text.literal("...There's only one thing left to do.").formatted(Formatting.YELLOW)));
                     world.playSound(null, player.getBlockPos(),
                         SoundEvents.ENTITY_VILLAGER_TRADE, SoundCategory.MASTER, 0.8f, 1.1f);
                 },
@@ -231,12 +249,30 @@ public class PathogenesisMod implements ModInitializer {
                     player.networkHandler.sendPacket(new TitleS2CPacket(
                         Text.literal("Biotech92130").formatted(Formatting.GREEN, Formatting.BOLD)));
                     player.networkHandler.sendPacket(new SubtitleS2CPacket(
-                        Text.literal("I'm going in.").formatted(Formatting.WHITE)));
+                        Text.literal("You can't be serious. Nobody has ever come back from that.").formatted(Formatting.WHITE)));
                     world.playSound(null, player.getBlockPos(),
-                        SoundEvents.ENTITY_VILLAGER_WORK_CARTOGRAPHER, SoundCategory.MASTER, 0.8f, 0.85f);
+                        SoundEvents.ENTITY_VILLAGER_AMBIENT, SoundCategory.MASTER, 0.8f, 0.8f);
                 },
                 () -> {
-                    // Villagers disappear just before the big title
+                    player.networkHandler.sendPacket(new TitleFadeS2CPacket(5, 45, 5));
+                    player.networkHandler.sendPacket(new TitleS2CPacket(
+                        Text.literal("Doc432").formatted(Formatting.AQUA, Formatting.BOLD)));
+                    player.networkHandler.sendPacket(new SubtitleS2CPacket(
+                        Text.literal("Someone has to. Suit up.").formatted(Formatting.YELLOW)));
+                    world.playSound(null, player.getBlockPos(),
+                        SoundEvents.ENTITY_VILLAGER_TRADE, SoundCategory.MASTER, 0.8f, 1.3f);
+                },
+                () -> {
+                    player.networkHandler.sendPacket(new TitleFadeS2CPacket(10, 55, 10));
+                    player.networkHandler.sendPacket(new TitleS2CPacket(
+                        Text.literal("Biotech92130").formatted(Formatting.GREEN, Formatting.BOLD)));
+                    player.networkHandler.sendPacket(new SubtitleS2CPacket(
+                        Text.literal("...I'm going in.").formatted(Formatting.WHITE)));
+                    world.playSound(null, player.getBlockPos(),
+                        SoundEvents.ENTITY_VILLAGER_WORK_CARTOGRAPHER, SoundCategory.MASTER, 0.8f, 0.75f);
+                },
+                () -> {
+                    // Villagers disappear, PATHOGENESIS title drops
                     doc.discard();
                     bio.discard();
                     player.networkHandler.sendPacket(new TitleFadeS2CPacket(20, 80, 20));
@@ -249,14 +285,14 @@ public class PathogenesisMod implements ModInitializer {
                 }
             };
 
-            int[] delays = {5, 60, 115, 170, 230};
+            int[] delays = {5, 60, 115, 170, 235, 300, 355, 415, 480};
             for (int i = 0; i < lines.length; i++) {
                 final Runnable line = lines[i];
                 scheduleAt(server, delays[i], line);
             }
 
             // After the PATHOGENESIS title fades out: remove the room and TP player to world spawn
-            scheduleAt(server, 355, () -> {
+            scheduleAt(server, 605, () -> {
                 if (!player.isAlive()) return;
                 for (BlockPos pos : roomBlocks) {
                     world.setBlockState(pos, Blocks.AIR.getDefaultState(), 2);
