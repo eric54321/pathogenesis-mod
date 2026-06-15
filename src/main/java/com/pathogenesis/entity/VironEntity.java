@@ -44,7 +44,7 @@ public class VironEntity extends VirusEntity {
     private static final double ATTACK_DAMAGE = 2.0;    // 1 heart
     private static final double FOLLOW_RANGE  = 20.0;
 
-    // How many extra Virons spawn alongside the "leader" Viron
+    // How many extra Virons spawn alongside the "leader" Viron — subclasses can override
     private static final int SWARM_FOLLOWERS = 4;
 
     // Infection: Weakness II lasts 5 seconds (100 ticks)
@@ -117,15 +117,24 @@ public class VironEntity extends VirusEntity {
     }
 
     /**
-     * Spawns SWARM_FOLLOWERS additional Virons in a ring around this one.
+     * Returns how many followers spawn with this virus.
+     * Subclasses override this to change swarm size.
+     */
+    protected int getSwarmSize() {
+        return SWARM_FOLLOWERS;
+    }
+
+    /**
+     * Spawns getSwarmSize() additional copies in a ring around this one.
      * Each follower is marked as a swarm member so it does not spawn its own swarm.
      */
     private void spawnSwarm(ServerWorldAccess world) {
-        for (int i = 0; i < SWARM_FOLLOWERS; i++) {
+        int count = getSwarmSize();
+        for (int i = 0; i < count; i++) {
             VironEntity follower = new VironEntity(ModEntities.VIRON, world.toServerWorld());
 
-            // Spread followers evenly in a circle (every 72 degrees for 5 total)
-            double angle = (2 * Math.PI / SWARM_FOLLOWERS) * i;
+            // Spread followers evenly in a circle
+            double angle = (2 * Math.PI / count) * i;
             double offsetX = Math.cos(angle) * 2.0;
             double offsetZ = Math.sin(angle) * 2.0;
             double offsetY = (Math.random() - 0.5) * 1.5;  // slight vertical scatter

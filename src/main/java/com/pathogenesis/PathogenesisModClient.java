@@ -2,6 +2,7 @@ package com.pathogenesis;
 
 import com.pathogenesis.entity.model.RogueCellModel;
 import com.pathogenesis.entity.model.VironModel;
+import com.pathogenesis.entity.renderer.CoronavirusRenderer;
 import com.pathogenesis.entity.renderer.InfluenzaRenderer;
 import com.pathogenesis.entity.renderer.RogueCellRenderer;
 import com.pathogenesis.entity.renderer.VironRenderer;
@@ -23,9 +24,13 @@ public class PathogenesisModClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.VIRON, VironModel::getTexturedModelData);
         EntityRendererRegistry.register(ModEntities.VIRON, VironRenderer::new);
 
-        // Influenza (reuses Viron model layer until custom model is made in Blockbench)
+        // Influenza (reuses Viron model until custom Blockbench model is made)
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.INFLUENZA, VironModel::getTexturedModelData);
         EntityRendererRegistry.register(ModEntities.INFLUENZA, InfluenzaRenderer::new);
+
+        // Coronavirus (reuses Viron model until crown-shaped Blockbench model is made)
+        EntityModelLayerRegistry.registerModelLayer(ModModelLayers.CORONAVIRUS, VironModel::getTexturedModelData);
+        EntityRendererRegistry.register(ModEntities.CORONAVIRUS, CoronavirusRenderer::new);
 
         PathogenesisMod.LOGGER.info("Pathogenesis client initialized.");
     }

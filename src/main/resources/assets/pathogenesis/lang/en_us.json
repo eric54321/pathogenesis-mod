@@ -2,6 +2,7 @@
   "entity.pathogenesis.rogue_cell": "Rogue Cell",
   "entity.pathogenesis.viron": "Viron",
   "entity.pathogenesis.influenza": "Influenza Virus",
+  "entity.pathogenesis.coronavirus": "Coronavirus",
   "item.pathogenesis.cart_injector": "CAR-T Injector",
   "item.pathogenesis.cart_injector.tooltip1": "Reprograms your T-cells to permanently seek and destroy cancer cells.",
   "item.pathogenesis.cart_injector.tooltip2": "Permanently increases attack damage. One use only.",

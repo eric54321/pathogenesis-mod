@@ -1,6 +1,7 @@
 package com.pathogenesis.init;
 
 import com.pathogenesis.PathogenesisMod;
+import com.pathogenesis.entity.CoronavirusEntity;
 import com.pathogenesis.entity.InfluenzaEntity;
 import com.pathogenesis.entity.RogueCellEntity;
 import com.pathogenesis.entity.VironEntity;
@@ -56,6 +57,18 @@ public class ModEntities {
     );
 
     /**
+     * Coronavirus — slow, larger virus with Blindness + Weakness infection.
+     * Spawns in smaller swarms of 3.
+     */
+    public static final EntityType<CoronavirusEntity> CORONAVIRUS = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(PathogenesisMod.MOD_ID, "coronavirus"),
+        EntityType.Builder.create(CoronavirusEntity::new, SpawnGroup.MONSTER)
+            .dimensions(0.7f, 0.7f)
+            .build()
+    );
+
+    /**
      * Called from PathogenesisMod.onInitialize().
      * Registers entity attribute sets (health, speed, damage) for each mob.
      * Without this call the game will crash when the entity tries to spawn.
@@ -64,6 +77,7 @@ public class ModEntities {
         FabricDefaultAttributeRegistry.register(ROGUE_CELL, RogueCellEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(VIRON, VironEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(INFLUENZA, InfluenzaEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(CORONAVIRUS, CoronavirusEntity.createAttributes());
 
         PathogenesisMod.LOGGER.info("Pathogenesis entities registered.");
     }
