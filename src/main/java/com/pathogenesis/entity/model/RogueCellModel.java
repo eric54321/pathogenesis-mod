@@ -80,9 +80,26 @@ public class RogueCellModel extends EntityModel<RogueCellEntity> {
     public void setAngles(RogueCellEntity entity, float limbAngle, float limbDistance,
                           float animationProgress, float headYaw, float headPitch) {
         float spin = animationProgress * 0.8f;
-        // Lean the whole disc toward the target — higher multiplier = more dramatic tilt
-        float tiltYaw   = headYaw   * ((float)Math.PI / 180f) * 0.85f;
-        float tiltPitch = headPitch * ((float)Math.PI / 180f) * 0.85f;
+
+        // Always lean toward the nearest player, not just when actively targeting
+        float tiltYaw   = headYaw   * ((float)Math.PI / 180f);
+        float tiltPitch = headPitch * ((float)Math.PI / 180f);
+        net.minecraft.entity.player.PlayerEntity nearest =
+            entity.getWorld().getClosestPlayer(entity, 48.0);
+        if (nearest != null) {
+            double dx = nearest.getX() - entity.getX();
+            double dy = nearest.getEyeY() - entity.getEyeY();
+            double dz = nearest.getZ() - entity.getZ();
+            double horizDist = Math.sqrt(dx * dx + dz * dz);
+            float toPlayerYaw   = (float)Math.atan2(-dx, dz);
+            float toPlayerPitch = (float)-Math.atan2(dy, horizDist);
+            float bodyYawRad    = entity.getBodyYaw() * ((float)Math.PI / 180f);
+            tiltYaw   = toPlayerYaw - bodyYawRad;
+            tiltPitch = toPlayerPitch;
+        }
+        // Strong lean — multiply so it really tilts toward the player
+        tiltYaw   *= 1.4f;
+        tiltPitch *= 1.4f;
 
         for (ModelPart p : new ModelPart[]{core, segN, segS, segE, segW,
                 segNE, segNW, segSE, segSW, innerNE, innerNW, innerSE, innerSW}) {
