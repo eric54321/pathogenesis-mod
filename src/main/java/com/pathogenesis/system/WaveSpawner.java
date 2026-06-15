@@ -1,7 +1,10 @@
 package com.pathogenesis.system;
 
 import com.pathogenesis.PathogenesisMod;
+import com.pathogenesis.entity.CoronavirusEntity;
+import com.pathogenesis.entity.InfluenzaEntity;
 import com.pathogenesis.entity.RogueCellEntity;
+import com.pathogenesis.entity.VironEntity;
 import com.pathogenesis.init.ModEntities;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
@@ -183,10 +186,50 @@ public class WaveSpawner {
                 (int) spawnZ
             );
 
-            // Create and place the enemy
-            RogueCellEntity enemy = new RogueCellEntity(ModEntities.ROGUE_CELL, world);
+            // Pick enemy type based on wave number:
+            //   Wave 1-2:  RogueCell (cancer) + Viron (basic virus)
+            //   Wave 3-4:  add Influenza
+            //   Wave 5+:   add Coronavirus
+            // Within each wave, alternate between types for variety.
+            net.minecraft.entity.mob.MobEntity enemy;
+            int type = pickEnemyType(i, totalEnemies);
+            enemy = switch (type) {
+                case 1 -> new VironEntity(ModEntities.VIRON, world);
+                case 2 -> new InfluenzaEntity(ModEntities.INFLUENZA, world);
+                case 3 -> new CoronavirusEntity(ModEntities.CORONAVIRUS, world);
+                default -> new RogueCellEntity(ModEntities.ROGUE_CELL, world);
+            };
             enemy.refreshPositionAndAngles(spawnX, spawnY, spawnZ, 0.0f, 0.0f);
             world.spawnEntity(enemy);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Enemy type selection
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns an enemy type code based on wave progression and enemy index.
+     *   0 = RogueCell, 1 = Viron, 2 = Influenza, 3 = Coronavirus
+     *
+     * Wave 1-2: 60% RogueCell, 40% Viron
+     * Wave 3-4: 40% RogueCell, 30% Viron, 30% Influenza
+     * Wave 5+:  25% each of all four types
+     */
+    private static int pickEnemyType(int enemyIndex, int totalEnemies) {
+        // Use modulo of enemy index for deterministic spread within a wave
+        int slot = enemyIndex % 20;
+        if (waveNumber <= 2) {
+            return slot < 12 ? 0 : 1;            // 60% RogueCell, 40% Viron
+        } else if (waveNumber <= 4) {
+            if (slot < 8) return 0;              // 40% RogueCell
+            if (slot < 14) return 1;             // 30% Viron
+            return 2;                            // 30% Influenza
+        } else {
+            if (slot < 5)  return 0;             // 25% RogueCell
+            if (slot < 10) return 1;             // 25% Viron
+            if (slot < 15) return 2;             // 25% Influenza
+            return 3;                            // 25% Coronavirus
         }
     }
 

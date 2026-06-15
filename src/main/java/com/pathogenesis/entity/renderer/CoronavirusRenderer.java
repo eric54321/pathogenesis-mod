@@ -12,13 +12,13 @@ import net.minecraft.util.Identifier;
  * Blockbench model is created. Larger shadow (0.4f) matches bigger hitbox.
  * TODO: create coronavirus.bbmodel with crown spike arrangement.
  */
-public class CoronavirusRenderer extends MobEntityRenderer<CoronavirusEntity, VironModel> {
+public class CoronavirusRenderer extends MobEntityRenderer<CoronavirusEntity, VironModel<CoronavirusEntity>> {
 
     private static final Identifier TEXTURE =
         Identifier.of("pathogenesis", "textures/entity/viron.png");
 
     public CoronavirusRenderer(EntityRendererFactory.Context context) {
-        super(context, new VironModel(context.getPart(ModModelLayers.CORONAVIRUS)), 0.4f);
+        super(context, new VironModel<>(context.getPart(ModModelLayers.CORONAVIRUS)), 0.4f);
     }
 
     @Override

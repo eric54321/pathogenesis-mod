@@ -125,13 +125,21 @@ public class VironEntity extends VirusEntity {
     }
 
     /**
+     * Creates a follower of the correct subtype. Subclasses override this so
+     * InfluenzaEntity swarms spawn InfluenzaEntity followers, not VironEntity.
+     */
+    protected VironEntity createFollower(World world) {
+        return new VironEntity(ModEntities.VIRON, world);
+    }
+
+    /**
      * Spawns getSwarmSize() additional copies in a ring around this one.
      * Each follower is marked as a swarm member so it does not spawn its own swarm.
      */
     private void spawnSwarm(ServerWorldAccess world) {
         int count = getSwarmSize();
         for (int i = 0; i < count; i++) {
-            VironEntity follower = new VironEntity(ModEntities.VIRON, world.toServerWorld());
+            VironEntity follower = createFollower(world.toServerWorld());
 
             // Spread followers evenly in a circle
             double angle = (2 * Math.PI / count) * i;

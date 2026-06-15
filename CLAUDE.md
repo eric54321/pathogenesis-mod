@@ -24,8 +24,10 @@ src/main/java/com/pathogenesis/
 ├── PathogenesisMod.java          — server entrypoint (registration)
 ├── PathogenesisModClient.java    — client entrypoint (renderers)
 ├── entity/
-│   ├── VirusEntity.java          — abstract base for all viruses
-│   ├── VironEntity.java          — fast swarm virus, Weakness debuff on hit
+│   ├── VirusEntity.java          — abstract base for all viruses (flying nav, infection-on-hit)
+│   ├── VironEntity.java          — fast swarm virus, Weakness II on hit; base of virus hierarchy
+│   ├── InfluenzaEntity.java      — extends VironEntity; Nausea + Slowness II; swarm of 5
+│   ├── CoronavirusEntity.java    — extends VironEntity; Blindness + Weakness; swarm of 2
 │   └── RogueCellEntity.java      — cancer cell, splits into 2 on death
 │   ├── model/                    — Java model classes (generated from Blockbench)
 │   └── renderer/                 — entity renderers
@@ -54,8 +56,25 @@ src/main/resources/assets/pathogenesis/
 7. Add display name in `lang/en_us.json`
 8. Add to `WaveSpawner.spawnEnemies()` so it appears in waves
 
+## Virus Class Hierarchy
+```
+VirusEntity          — abstract: flying nav, no gravity, infection-on-hit dispatch
+  └── VironEntity    — swarm mechanic, Weakness II; createFollower() pattern for subclasses
+        ├── InfluenzaEntity    — Nausea + Slowness II, 8 HP, swarm of 5
+        └── CoronavirusEntity  — Blindness + Weakness, 10 HP, swarm of 2 (slower replication)
+```
+Each subclass overrides `createAttributes()`, `applyInfectionEffect()`, and optionally `getSwarmSize()`.
+`createFollower()` must be overridden in every VironEntity subclass so swarms spawn the correct type.
+
 ## Adding a New Virus (Fastest Path)
-Extend `VirusEntity` and override only `applyInfectionEffect()`:
+Extend `VironEntity` and override `createAttributes()`, `applyInfectionEffect()`, and `createFollower()`:
+```java
+@Override
+protected VironEntity createFollower(World world) {
+    return new YourVirusEntity(ModEntities.YOUR_VIRUS, world);
+}
+```
+Then extend `VirusEntity` directly if you need a virus that does NOT swarm.
 ```java
 @Override
 protected void applyInfectionEffect(LivingEntity target) {

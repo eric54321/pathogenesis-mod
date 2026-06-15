@@ -1,5 +1,6 @@
 package com.pathogenesis.entity;
 
+import com.pathogenesis.init.ModEntities;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -44,6 +45,10 @@ public class CoronavirusEntity extends VironEntity {
     }
 
     @Override
+    protected VironEntity createFollower(World world) {
+        return new CoronavirusEntity(ModEntities.CORONAVIRUS, world);
+    }
+
     public static DefaultAttributeContainer.Builder createAttributes() {
         return HostileEntity.createHostileAttributes()
             .add(EntityAttributes.GENERIC_MAX_HEALTH,    MAX_HEALTH)

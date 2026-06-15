@@ -1,5 +1,6 @@
 package com.pathogenesis.entity;
 
+import com.pathogenesis.init.ModEntities;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -41,6 +42,11 @@ public class InfluenzaEntity extends VironEntity {
 
     public InfluenzaEntity(EntityType<? extends InfluenzaEntity> type, World world) {
         super(type, world);
+    }
+
+    @Override
+    protected VironEntity createFollower(World world) {
+        return new InfluenzaEntity(ModEntities.INFLUENZA, world);
     }
 
     /**
