@@ -157,7 +157,14 @@ public class PathogenesisMod implements ModInitializer {
                 place(world, rx-W, y, rz+4, Blocks.IRON_BLOCK, roomBlocks);
             }
 
-            // TP player to an elevated position south of the villagers, looking down at them
+            // Glass observation platform for the player to stand on (3x3, elevated)
+            for (int x = rx-1; x <= rx+1; x++) {
+                for (int z = rz+3; z <= rz+5; z++) {
+                    place(world, x, ry+3, z, Blocks.BARRIER, roomBlocks);
+                }
+            }
+
+            // TP player onto the platform, looking down at the villagers
             // yaw=180 (facing north), pitch=40 (looking down ~40 degrees)
             player.networkHandler.requestTeleport(rx + 0.5, ry + 4, rz + 4, 180f, 40f);
 
