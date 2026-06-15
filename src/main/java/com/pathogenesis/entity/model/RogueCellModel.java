@@ -7,96 +7,118 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 
 /**
- * Vertical disc model — stands upright like a coin floating in the air.
- * Octagonal cross-section for maximum circularity.
- * Texture 64x32 with distinct color zones per part.
+ * Thin circular disc — 12-segment approximation of a circle, only 2 units deep.
+ * Segments arranged like a clock face to maximize roundness.
+ * Texture 64x32.
  */
 public class RogueCellModel extends EntityModel<RogueCellEntity> {
 
+    // Center + 8 edge segments + 4 inner diagonal fills = 13 parts
     private final ModelPart core;
-    private final ModelPart bumpTop;
-    private final ModelPart bumpBot;
-    private final ModelPart bumpLeft;
-    private final ModelPart bumpRight;
-    private final ModelPart cornerTL;
-    private final ModelPart cornerTR;
-    private final ModelPart cornerBL;
-    private final ModelPart cornerBR;
-    private final ModelPart nucleus;
+    private final ModelPart segN;
+    private final ModelPart segNE;
+    private final ModelPart segE;
+    private final ModelPart segSE;
+    private final ModelPart segS;
+    private final ModelPart segSW;
+    private final ModelPart segW;
+    private final ModelPart segNW;
+    private final ModelPart innerNE;
+    private final ModelPart innerNW;
+    private final ModelPart innerSE;
+    private final ModelPart innerSW;
 
     public RogueCellModel(ModelPart root) {
-        this.core      = root.getChild("core");
-        this.bumpTop   = root.getChild("bump_top");
-        this.bumpBot   = root.getChild("bump_bot");
-        this.bumpLeft  = root.getChild("bump_left");
-        this.bumpRight = root.getChild("bump_right");
-        this.cornerTL  = root.getChild("corner_tl");
-        this.cornerTR  = root.getChild("corner_tr");
-        this.cornerBL  = root.getChild("corner_bl");
-        this.cornerBR  = root.getChild("corner_br");
-        this.nucleus   = root.getChild("nucleus");
+        this.core    = root.getChild("core");
+        this.segN    = root.getChild("seg_n");
+        this.segNE   = root.getChild("seg_ne");
+        this.segE    = root.getChild("seg_e");
+        this.segSE   = root.getChild("seg_se");
+        this.segS    = root.getChild("seg_s");
+        this.segSW   = root.getChild("seg_sw");
+        this.segW    = root.getChild("seg_w");
+        this.segNW   = root.getChild("seg_nw");
+        this.innerNE = root.getChild("inner_ne");
+        this.innerNW = root.getChild("inner_nw");
+        this.innerSE = root.getChild("inner_se");
+        this.innerSW = root.getChild("inner_sw");
     }
 
     public static TexturedModelData getTexturedModelData() {
         ModelData md = new ModelData();
         ModelPartData r = md.getRoot();
 
-        // Core: wide and tall but thin — vertical disc
+        // All parts are 2 units deep (Z) for a thin disc
+        // D=2 everywhere → UV depth contribution = 2
+
+        // Core: 6x6x2 center
         r.addChild("core",
             ModelPartBuilder.create().uv(0, 0)
-                .cuboid(-4f, -4f, -1.5f, 8, 8, 3),
+                .cuboid(-3f, -3f, -1f, 6, 6, 2),
             ModelTransform.pivot(0f, 20f, 0f));
 
-        // Nucleus — bright center dot
-        r.addChild("nucleus",
-            ModelPartBuilder.create().uv(22, 0)
-                .cuboid(-1.5f, -1.5f, -2f, 3, 3, 3),
+        // Cardinal edge segments (2 wide, 2 tall, 2 deep)
+        r.addChild("seg_n",
+            ModelPartBuilder.create().uv(20, 0)
+                .cuboid(-1f, -2f, -1f, 2, 2, 2),
+            ModelTransform.pivot(0f, 17f, 0f));
+
+        r.addChild("seg_s",
+            ModelPartBuilder.create().uv(20, 0)
+                .cuboid(-1f, 0f, -1f, 2, 2, 2),
+            ModelTransform.pivot(0f, 23f, 0f));
+
+        r.addChild("seg_e",
+            ModelPartBuilder.create().uv(20, 0)
+                .cuboid(0f, -1f, -1f, 2, 2, 2),
+            ModelTransform.pivot(3f, 20f, 0f));
+
+        r.addChild("seg_w",
+            ModelPartBuilder.create().uv(20, 0)
+                .cuboid(-2f, -1f, -1f, 2, 2, 2),
+            ModelTransform.pivot(-3f, 20f, 0f));
+
+        // Diagonal edge segments (2x2x2) at 45° corners
+        r.addChild("seg_ne",
+            ModelPartBuilder.create().uv(28, 0)
+                .cuboid(0f, -2f, -1f, 2, 2, 2),
+            ModelTransform.pivot(2f, 18f, 0f));
+
+        r.addChild("seg_nw",
+            ModelPartBuilder.create().uv(28, 0)
+                .cuboid(-2f, -2f, -1f, 2, 2, 2),
+            ModelTransform.pivot(-2f, 18f, 0f));
+
+        r.addChild("seg_se",
+            ModelPartBuilder.create().uv(28, 0)
+                .cuboid(0f, 0f, -1f, 2, 2, 2),
+            ModelTransform.pivot(2f, 22f, 0f));
+
+        r.addChild("seg_sw",
+            ModelPartBuilder.create().uv(28, 0)
+                .cuboid(-2f, 0f, -1f, 2, 2, 2),
+            ModelTransform.pivot(-2f, 22f, 0f));
+
+        // Inner diagonal fills (3x3x2) to smooth out gaps between core and corners
+        r.addChild("inner_ne",
+            ModelPartBuilder.create().uv(36, 0)
+                .cuboid(0f, -3f, -1f, 3, 3, 2),
             ModelTransform.pivot(0f, 20f, 0f));
 
-        // Top bump — extends upward
-        r.addChild("bump_top",
-            ModelPartBuilder.create().uv(0, 12)
-                .cuboid(-3f, -2f, -1.5f, 6, 2, 3),
-            ModelTransform.pivot(0f, 16f, 0f));
+        r.addChild("inner_nw",
+            ModelPartBuilder.create().uv(36, 0)
+                .cuboid(-3f, -3f, -1f, 3, 3, 2),
+            ModelTransform.pivot(0f, 20f, 0f));
 
-        // Bottom bump
-        r.addChild("bump_bot",
-            ModelPartBuilder.create().uv(18, 12)
-                .cuboid(-3f, 0f, -1.5f, 6, 2, 3),
-            ModelTransform.pivot(0f, 24f, 0f));
+        r.addChild("inner_se",
+            ModelPartBuilder.create().uv(36, 0)
+                .cuboid(0f, 0f, -1f, 3, 3, 2),
+            ModelTransform.pivot(0f, 20f, 0f));
 
-        // Left bump
-        r.addChild("bump_left",
-            ModelPartBuilder.create().uv(0, 18)
-                .cuboid(-2f, -3f, -1.5f, 2, 6, 3),
-            ModelTransform.pivot(-4f, 20f, 0f));
-
-        // Right bump
-        r.addChild("bump_right",
-            ModelPartBuilder.create().uv(10, 18)
-                .cuboid(0f, -3f, -1.5f, 2, 6, 3),
-            ModelTransform.pivot(4f, 20f, 0f));
-
-        // Diagonal corners — fill the octagon gaps
-        r.addChild("corner_tl",
-            ModelPartBuilder.create().uv(20, 18)
-                .cuboid(-2f, -2f, -1.5f, 2, 2, 3),
-            ModelTransform.pivot(-3f, 18f, 0f));
-
-        r.addChild("corner_tr",
-            ModelPartBuilder.create().uv(30, 18)
-                .cuboid(0f, -2f, -1.5f, 2, 2, 3),
-            ModelTransform.pivot(3f, 18f, 0f));
-
-        r.addChild("corner_bl",
-            ModelPartBuilder.create().uv(40, 18)
-                .cuboid(-2f, 0f, -1.5f, 2, 2, 3),
-            ModelTransform.pivot(-3f, 22f, 0f));
-
-        r.addChild("corner_br",
-            ModelPartBuilder.create().uv(50, 18)
-                .cuboid(0f, 0f, -1.5f, 2, 2, 3),
-            ModelTransform.pivot(3f, 22f, 0f));
+        r.addChild("inner_sw",
+            ModelPartBuilder.create().uv(36, 0)
+                .cuboid(-3f, 0f, -1f, 3, 3, 2),
+            ModelTransform.pivot(0f, 20f, 0f));
 
         return TexturedModelData.of(md, 64, 32);
     }
@@ -104,31 +126,28 @@ public class RogueCellModel extends EntityModel<RogueCellEntity> {
     @Override
     public void setAngles(RogueCellEntity entity, float limbAngle, float limbDistance,
                           float animationProgress, float headYaw, float headPitch) {
-        // Slow spin around Y axis
-        float spin = animationProgress * 0.04f;
-        core.yaw      = spin;
-        bumpTop.yaw   = spin;
-        bumpBot.yaw   = spin;
-        bumpLeft.yaw  = spin;
-        bumpRight.yaw = spin;
-        cornerTL.yaw  = spin;
-        cornerTR.yaw  = spin;
-        cornerBL.yaw  = spin;
-        cornerBR.yaw  = spin;
-        nucleus.yaw   = spin;
+        // Slow spin on Y axis so you always see the face
+        float spin = animationProgress * 0.03f;
+        for (ModelPart p : new ModelPart[]{core, segN, segS, segE, segW,
+                segNE, segNW, segSE, segSW, innerNE, innerNW, innerSE, innerSW}) {
+            p.yaw = spin;
+        }
     }
 
     @Override
     public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         core.render(matrices, vertices, light, overlay, color);
-        bumpTop.render(matrices, vertices, light, overlay, color);
-        bumpBot.render(matrices, vertices, light, overlay, color);
-        bumpLeft.render(matrices, vertices, light, overlay, color);
-        bumpRight.render(matrices, vertices, light, overlay, color);
-        cornerTL.render(matrices, vertices, light, overlay, color);
-        cornerTR.render(matrices, vertices, light, overlay, color);
-        cornerBL.render(matrices, vertices, light, overlay, color);
-        cornerBR.render(matrices, vertices, light, overlay, color);
-        nucleus.render(matrices, vertices, light, overlay, color);
+        segN.render(matrices, vertices, light, overlay, color);
+        segS.render(matrices, vertices, light, overlay, color);
+        segE.render(matrices, vertices, light, overlay, color);
+        segW.render(matrices, vertices, light, overlay, color);
+        segNE.render(matrices, vertices, light, overlay, color);
+        segNW.render(matrices, vertices, light, overlay, color);
+        segSE.render(matrices, vertices, light, overlay, color);
+        segSW.render(matrices, vertices, light, overlay, color);
+        innerNE.render(matrices, vertices, light, overlay, color);
+        innerNW.render(matrices, vertices, light, overlay, color);
+        innerSE.render(matrices, vertices, light, overlay, color);
+        innerSW.render(matrices, vertices, light, overlay, color);
     }
 }
