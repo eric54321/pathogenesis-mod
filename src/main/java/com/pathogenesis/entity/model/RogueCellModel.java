@@ -6,10 +6,6 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 
-/**
- * Thin circular disc with 4 tentacles orbiting it.
- * Tentacles are root-level parts; their pivots are updated each frame to orbit the disc center.
- */
 public class RogueCellModel extends EntityModel<RogueCellEntity> {
 
     private final ModelPart core;
@@ -41,36 +37,27 @@ public class RogueCellModel extends EntityModel<RogueCellEntity> {
         ModelData md = new ModelData();
         ModelPartData r = md.getRoot();
 
-        // Core: 6x6x2 center disc
-        r.addChild("core",
-            ModelPartBuilder.create().uv(0, 0).cuboid(-3f, -3f, -1f, 6, 6, 2),
-            ModelTransform.pivot(0f, 20f, 0f));
+        // Disc
+        r.addChild("core",     ModelPartBuilder.create().uv(0,0) .cuboid(-3f,-3f,-1f,6,6,2),   ModelTransform.pivot(0f,20f,0f));
+        r.addChild("seg_n",    ModelPartBuilder.create().uv(20,0).cuboid(-1f,-2f,-1f,2,2,2),   ModelTransform.pivot(0f,17f,0f));
+        r.addChild("seg_s",    ModelPartBuilder.create().uv(20,0).cuboid(-1f, 0f,-1f,2,2,2),   ModelTransform.pivot(0f,23f,0f));
+        r.addChild("seg_e",    ModelPartBuilder.create().uv(20,0).cuboid( 0f,-1f,-1f,2,2,2),   ModelTransform.pivot(3f,20f,0f));
+        r.addChild("seg_w",    ModelPartBuilder.create().uv(20,0).cuboid(-2f,-1f,-1f,2,2,2),   ModelTransform.pivot(-3f,20f,0f));
+        r.addChild("seg_ne",   ModelPartBuilder.create().uv(28,0).cuboid( 0f,-2f,-1f,2,2,2),   ModelTransform.pivot(2f,18f,0f));
+        r.addChild("seg_nw",   ModelPartBuilder.create().uv(28,0).cuboid(-2f,-2f,-1f,2,2,2),   ModelTransform.pivot(-2f,18f,0f));
+        r.addChild("seg_se",   ModelPartBuilder.create().uv(28,0).cuboid( 0f, 0f,-1f,2,2,2),   ModelTransform.pivot(2f,22f,0f));
+        r.addChild("seg_sw",   ModelPartBuilder.create().uv(28,0).cuboid(-2f, 0f,-1f,2,2,2),   ModelTransform.pivot(-2f,22f,0f));
+        r.addChild("inner_ne", ModelPartBuilder.create().uv(36,0).cuboid( 0f,-3f,-1f,3,3,2),   ModelTransform.pivot(0f,20f,0f));
+        r.addChild("inner_nw", ModelPartBuilder.create().uv(36,0).cuboid(-3f,-3f,-1f,3,3,2),   ModelTransform.pivot(0f,20f,0f));
+        r.addChild("inner_se", ModelPartBuilder.create().uv(36,0).cuboid( 0f, 0f,-1f,3,3,2),   ModelTransform.pivot(0f,20f,0f));
+        r.addChild("inner_sw", ModelPartBuilder.create().uv(36,0).cuboid(-3f, 0f,-1f,3,3,2),   ModelTransform.pivot(0f,20f,0f));
 
-        // Cardinal edge segments
-        r.addChild("seg_n",  ModelPartBuilder.create().uv(20,0).cuboid(-1f,-2f,-1f,2,2,2), ModelTransform.pivot(0f,17f,0f));
-        r.addChild("seg_s",  ModelPartBuilder.create().uv(20,0).cuboid(-1f, 0f,-1f,2,2,2), ModelTransform.pivot(0f,23f,0f));
-        r.addChild("seg_e",  ModelPartBuilder.create().uv(20,0).cuboid( 0f,-1f,-1f,2,2,2), ModelTransform.pivot(3f,20f,0f));
-        r.addChild("seg_w",  ModelPartBuilder.create().uv(20,0).cuboid(-2f,-1f,-1f,2,2,2), ModelTransform.pivot(-3f,20f,0f));
-
-        // Diagonal edge segments
-        r.addChild("seg_ne", ModelPartBuilder.create().uv(28,0).cuboid( 0f,-2f,-1f,2,2,2), ModelTransform.pivot( 2f,18f,0f));
-        r.addChild("seg_nw", ModelPartBuilder.create().uv(28,0).cuboid(-2f,-2f,-1f,2,2,2), ModelTransform.pivot(-2f,18f,0f));
-        r.addChild("seg_se", ModelPartBuilder.create().uv(28,0).cuboid( 0f, 0f,-1f,2,2,2), ModelTransform.pivot( 2f,22f,0f));
-        r.addChild("seg_sw", ModelPartBuilder.create().uv(28,0).cuboid(-2f, 0f,-1f,2,2,2), ModelTransform.pivot(-2f,22f,0f));
-
-        // Inner diagonal fills
-        r.addChild("inner_ne", ModelPartBuilder.create().uv(36,0).cuboid( 0f,-3f,-1f,3,3,2), ModelTransform.pivot(0f,20f,0f));
-        r.addChild("inner_nw", ModelPartBuilder.create().uv(36,0).cuboid(-3f,-3f,-1f,3,3,2), ModelTransform.pivot(0f,20f,0f));
-        r.addChild("inner_se", ModelPartBuilder.create().uv(36,0).cuboid( 0f, 0f,-1f,3,3,2), ModelTransform.pivot(0f,20f,0f));
-        r.addChild("inner_sw", ModelPartBuilder.create().uv(36,0).cuboid(-3f, 0f,-1f,3,3,2), ModelTransform.pivot(0f,20f,0f));
-
-        // Tentacles: 2x2x10 box extending in the -Z direction from the pivot.
-        // Pivots start at the disc edge; setAngles orbits them by updating pivotX/Z each frame.
-        // uv(0,16): 2x2x10 box → 24 wide, 12 tall in UV space — fits in lower half of 64x32 texture.
-        r.addChild("tent_n", ModelPartBuilder.create().uv(0,16).cuboid(-1f,-1f,-10f,2,2,10), ModelTransform.pivot(0f,20f,-5f));
-        r.addChild("tent_s", ModelPartBuilder.create().uv(0,16).cuboid(-1f,-1f,-10f,2,2,10), ModelTransform.pivot(0f,20f, 5f));
-        r.addChild("tent_e", ModelPartBuilder.create().uv(0,16).cuboid(-1f,-1f,-10f,2,2,10), ModelTransform.pivot( 5f,20f,0f));
-        r.addChild("tent_w", ModelPartBuilder.create().uv(0,16).cuboid(-1f,-1f,-10f,2,2,10), ModelTransform.pivot(-5f,20f,0f));
+        // Tentacles: large 4x4x16 boxes, same UV as core, pivots at disc center.
+        // They point outward via yaw set in setAngles; box extends in -Z from pivot.
+        r.addChild("tent_n", ModelPartBuilder.create().uv(0,0).cuboid(-2f,-2f,-16f,4,4,16), ModelTransform.pivot(0f,20f,0f));
+        r.addChild("tent_s", ModelPartBuilder.create().uv(0,0).cuboid(-2f,-2f,-16f,4,4,16), ModelTransform.pivot(0f,20f,0f));
+        r.addChild("tent_e", ModelPartBuilder.create().uv(0,0).cuboid(-2f,-2f,-16f,4,4,16), ModelTransform.pivot(0f,20f,0f));
+        r.addChild("tent_w", ModelPartBuilder.create().uv(0,0).cuboid(-2f,-2f,-16f,4,4,16), ModelTransform.pivot(0f,20f,0f));
 
         return TexturedModelData.of(md, 64, 32);
     }
@@ -80,42 +67,26 @@ public class RogueCellModel extends EntityModel<RogueCellEntity> {
                           float animationProgress, float headYaw, float headPitch) {
         float spin = animationProgress * 0.03f;
 
-        // Disc parts all spin on Y
+        // Disc spin
         for (ModelPart p : new ModelPart[]{core, segN, segS, segE, segW,
                 segNE, segNW, segSE, segSW, innerNE, innerNW, innerSE, innerSW}) {
             p.yaw = spin;
         }
 
-        // Orbit each tentacle around disc center by updating its pivot each frame
-        float r = 5f; // orbit radius in model units
-        tentN.pivotX = -r * (float)Math.sin(spin);
-        tentN.pivotZ = -r * (float)Math.cos(spin);
-        tentN.yaw    = spin;
-
-        tentS.pivotX =  r * (float)Math.sin(spin);
-        tentS.pivotZ =  r * (float)Math.cos(spin);
-        tentS.yaw    = spin + (float)Math.PI;
-
-        tentE.pivotX =  r * (float)Math.cos(spin);
-        tentE.pivotZ = -r * (float)Math.sin(spin);
-        tentE.yaw    = spin - (float)(Math.PI / 2);
-
-        tentW.pivotX = -r * (float)Math.cos(spin);
-        tentW.pivotZ =  r * (float)Math.sin(spin);
-        tentW.yaw    = spin + (float)(Math.PI / 2);
-
-        // Lash animation: 60-tick cycle — snap outward then retract
+        // Lash animation: 60-tick cycle
         float cycle = (animationProgress % 60f) / 60f;
-        float lashFactor;
-        if (cycle < 0.25f) {
-            lashFactor = cycle / 0.25f;
-        } else if (cycle < 0.45f) {
-            lashFactor = 1f - (cycle - 0.25f) / 0.20f;
-        } else {
-            lashFactor = 0f;
-        }
-        // droop at rest (+0.4), snap flat on lash (-0.15)
+        float lashFactor = (cycle < 0.25f) ? cycle / 0.25f
+                         : (cycle < 0.45f) ? 1f - (cycle - 0.25f) / 0.20f
+                         : 0f;
+        // droop down at rest, snap horizontal on lash
         float tentPitch = 0.4f - lashFactor * 0.55f;
+
+        // Each tentacle points in a cardinal direction; the box extends 16 units in -Z from pivot
+        tentN.yaw = spin;                               // faces same direction as spin origin (north at spin=0)
+        tentS.yaw = spin + (float)Math.PI;              // south
+        tentE.yaw = spin - (float)(Math.PI / 2);       // east
+        tentW.yaw = spin + (float)(Math.PI / 2);       // west
+
         tentN.pitch = tentPitch;
         tentS.pitch = tentPitch;
         tentE.pitch = tentPitch;
