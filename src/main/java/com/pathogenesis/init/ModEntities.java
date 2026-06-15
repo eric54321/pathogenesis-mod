@@ -28,7 +28,7 @@ public class ModEntities {
         Registries.ENTITY_TYPE,
         Identifier.of(PathogenesisMod.MOD_ID, "rogue_cell"),
         EntityType.Builder.create(RogueCellEntity::new, SpawnGroup.MONSTER)
-            .dimensions(1.5f, 1.5f)
+            .dimensions(1.2f, 1.5f)
             .build()
     );
 

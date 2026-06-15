@@ -72,7 +72,10 @@ public class RogueCellEntity extends HostileEntity {
             .add(EntityAttributes.GENERIC_MAX_HEALTH, FULL_HEALTH)
             .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.38)
             .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 8.0)
-            .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0);
+            .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0)
+            .add(EntityAttributes.GENERIC_ARMOR, 10.0)
+            .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 4.0)
+            .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 0.8);
     }
 
     /**

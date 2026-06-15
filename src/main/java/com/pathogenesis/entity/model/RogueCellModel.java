@@ -7,113 +7,128 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 
 /**
- * Rounder blob model — approximates a sphere using a cross of overlapping cubes.
- * Texture layout (64x64):
- *   core      uv(0,0)  — 8x8x8
- *   topCap    uv(0,16) — 6x2x6
- *   botCap    uv(24,16)— 6x2x6
- *   frontBump uv(0,24) — 6x6x2
- *   backBump  uv(20,24)— 6x6x2
- *   leftBump  uv(0,32) — 2x6x6
- *   rightBump uv(16,32)— 2x6x6
- *   nucleus   uv(40,0) — 4x4x4
+ * Vertical disc model — stands upright like a coin floating in the air.
+ * Octagonal cross-section for maximum circularity.
+ * Texture 64x32 with distinct color zones per part.
  */
 public class RogueCellModel extends EntityModel<RogueCellEntity> {
 
     private final ModelPart core;
-    private final ModelPart topCap;
-    private final ModelPart botCap;
-    private final ModelPart frontBump;
-    private final ModelPart backBump;
-    private final ModelPart leftBump;
-    private final ModelPart rightBump;
+    private final ModelPart bumpTop;
+    private final ModelPart bumpBot;
+    private final ModelPart bumpLeft;
+    private final ModelPart bumpRight;
+    private final ModelPart cornerTL;
+    private final ModelPart cornerTR;
+    private final ModelPart cornerBL;
+    private final ModelPart cornerBR;
     private final ModelPart nucleus;
 
     public RogueCellModel(ModelPart root) {
         this.core      = root.getChild("core");
-        this.topCap    = root.getChild("top_cap");
-        this.botCap    = root.getChild("bot_cap");
-        this.frontBump = root.getChild("front_bump");
-        this.backBump  = root.getChild("back_bump");
-        this.leftBump  = root.getChild("left_bump");
-        this.rightBump = root.getChild("right_bump");
+        this.bumpTop   = root.getChild("bump_top");
+        this.bumpBot   = root.getChild("bump_bot");
+        this.bumpLeft  = root.getChild("bump_left");
+        this.bumpRight = root.getChild("bump_right");
+        this.cornerTL  = root.getChild("corner_tl");
+        this.cornerTR  = root.getChild("corner_tr");
+        this.cornerBL  = root.getChild("corner_bl");
+        this.cornerBR  = root.getChild("corner_br");
         this.nucleus   = root.getChild("nucleus");
     }
 
     public static TexturedModelData getTexturedModelData() {
-        ModelData modelData = new ModelData();
-        ModelPartData root = modelData.getRoot();
+        ModelData md = new ModelData();
+        ModelPartData r = md.getRoot();
 
-        // Central cube — the widest part of the sphere
-        root.addChild("core",
+        // Core: wide and tall but thin — vertical disc
+        r.addChild("core",
             ModelPartBuilder.create().uv(0, 0)
-                .cuboid(-4f, -4f, -4f, 8, 8, 8),
+                .cuboid(-4f, -4f, -1.5f, 8, 8, 3),
             ModelTransform.pivot(0f, 20f, 0f));
 
-        // Top cap — narrows the top like a sphere
-        root.addChild("top_cap",
-            ModelPartBuilder.create().uv(0, 16)
-                .cuboid(-3f, -2f, -3f, 6, 2, 6),
+        // Nucleus — bright center dot
+        r.addChild("nucleus",
+            ModelPartBuilder.create().uv(22, 0)
+                .cuboid(-1.5f, -1.5f, -2f, 3, 3, 3),
+            ModelTransform.pivot(0f, 20f, 0f));
+
+        // Top bump — extends upward
+        r.addChild("bump_top",
+            ModelPartBuilder.create().uv(0, 12)
+                .cuboid(-3f, -2f, -1.5f, 6, 2, 3),
             ModelTransform.pivot(0f, 16f, 0f));
 
-        // Bottom cap — narrows the bottom
-        root.addChild("bot_cap",
-            ModelPartBuilder.create().uv(24, 16)
-                .cuboid(-3f, 0f, -3f, 6, 2, 6),
+        // Bottom bump
+        r.addChild("bump_bot",
+            ModelPartBuilder.create().uv(18, 12)
+                .cuboid(-3f, 0f, -1.5f, 6, 2, 3),
             ModelTransform.pivot(0f, 24f, 0f));
 
-        // Front bump — rounds the front face
-        root.addChild("front_bump",
-            ModelPartBuilder.create().uv(0, 24)
-                .cuboid(-3f, -3f, -2f, 6, 6, 2),
-            ModelTransform.pivot(0f, 20f, -4f));
-
-        // Back bump
-        root.addChild("back_bump",
-            ModelPartBuilder.create().uv(20, 24)
-                .cuboid(-3f, -3f, 0f, 6, 6, 2),
-            ModelTransform.pivot(0f, 20f, 4f));
-
         // Left bump
-        root.addChild("left_bump",
-            ModelPartBuilder.create().uv(0, 32)
-                .cuboid(-2f, -3f, -3f, 2, 6, 6),
+        r.addChild("bump_left",
+            ModelPartBuilder.create().uv(0, 18)
+                .cuboid(-2f, -3f, -1.5f, 2, 6, 3),
             ModelTransform.pivot(-4f, 20f, 0f));
 
         // Right bump
-        root.addChild("right_bump",
-            ModelPartBuilder.create().uv(16, 32)
-                .cuboid(0f, -3f, -3f, 2, 6, 6),
+        r.addChild("bump_right",
+            ModelPartBuilder.create().uv(10, 18)
+                .cuboid(0f, -3f, -1.5f, 2, 6, 3),
             ModelTransform.pivot(4f, 20f, 0f));
 
-        // Nucleus — small inner sphere offset slightly
-        root.addChild("nucleus",
-            ModelPartBuilder.create().uv(40, 0)
-                .cuboid(-2f, -2f, -2f, 4, 4, 4),
-            ModelTransform.pivot(1f, 20f, 1f));
+        // Diagonal corners — fill the octagon gaps
+        r.addChild("corner_tl",
+            ModelPartBuilder.create().uv(20, 18)
+                .cuboid(-2f, -2f, -1.5f, 2, 2, 3),
+            ModelTransform.pivot(-3f, 18f, 0f));
 
-        return TexturedModelData.of(modelData, 64, 64);
+        r.addChild("corner_tr",
+            ModelPartBuilder.create().uv(30, 18)
+                .cuboid(0f, -2f, -1.5f, 2, 2, 3),
+            ModelTransform.pivot(3f, 18f, 0f));
+
+        r.addChild("corner_bl",
+            ModelPartBuilder.create().uv(40, 18)
+                .cuboid(-2f, 0f, -1.5f, 2, 2, 3),
+            ModelTransform.pivot(-3f, 22f, 0f));
+
+        r.addChild("corner_br",
+            ModelPartBuilder.create().uv(50, 18)
+                .cuboid(0f, 0f, -1.5f, 2, 2, 3),
+            ModelTransform.pivot(3f, 22f, 0f));
+
+        return TexturedModelData.of(md, 64, 32);
     }
 
     @Override
     public void setAngles(RogueCellEntity entity, float limbAngle, float limbDistance,
                           float animationProgress, float headYaw, float headPitch) {
-        // Slow gentle pulsing — the whole blob breathes
-        float pulse = (float) Math.sin(animationProgress * 0.08f) * 0.08f;
-        core.xScale = 1f + pulse;
-        core.yScale = 1f - pulse * 0.5f;
-        core.zScale = 1f + pulse;
+        // Slow spin around Y axis
+        float spin = animationProgress * 0.04f;
+        core.yaw      = spin;
+        bumpTop.yaw   = spin;
+        bumpBot.yaw   = spin;
+        bumpLeft.yaw  = spin;
+        bumpRight.yaw = spin;
+        cornerTL.yaw  = spin;
+        cornerTR.yaw  = spin;
+        cornerBL.yaw  = spin;
+        cornerBR.yaw  = spin;
+        nucleus.yaw   = spin;
     }
 
     @Override
     public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         core.render(matrices, vertices, light, overlay, color);
-        topCap.render(matrices, vertices, light, overlay, color);
-        botCap.render(matrices, vertices, light, overlay, color);
-        frontBump.render(matrices, vertices, light, overlay, color);
-        backBump.render(matrices, vertices, light, overlay, color);
-        leftBump.render(matrices, vertices, light, overlay, color);
-        rightBump.render(matrices, vertices, light, overlay, color);
+        bumpTop.render(matrices, vertices, light, overlay, color);
+        bumpBot.render(matrices, vertices, light, overlay, color);
+        bumpLeft.render(matrices, vertices, light, overlay, color);
+        bumpRight.render(matrices, vertices, light, overlay, color);
+        cornerTL.render(matrices, vertices, light, overlay, color);
+        cornerTR.render(matrices, vertices, light, overlay, color);
+        cornerBL.render(matrices, vertices, light, overlay, color);
+        cornerBR.render(matrices, vertices, light, overlay, color);
         nucleus.render(matrices, vertices, light, overlay, color);
     }
 }
