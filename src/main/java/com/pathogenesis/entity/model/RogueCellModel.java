@@ -79,7 +79,7 @@ public class RogueCellModel extends EntityModel<RogueCellEntity> {
     @Override
     public void setAngles(RogueCellEntity entity, float limbAngle, float limbDistance,
                           float animationProgress, float headYaw, float headPitch) {
-        float spin = animationProgress * 0.03f;
+        float spin = animationProgress * 0.18f;
 
         for (ModelPart p : new ModelPart[]{core, segN, segS, segE, segW,
                 segNE, segNW, segSE, segSW, innerNE, innerNW, innerSE, innerSW}) {
