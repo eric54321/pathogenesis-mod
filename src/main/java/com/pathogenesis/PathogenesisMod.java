@@ -7,6 +7,8 @@ import com.pathogenesis.system.WaveSpawner;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -21,7 +23,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.village.VillagerProfession;
+import net.minecraft.util.math.BlockPos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +41,13 @@ public class PathogenesisMod implements ModInitializer {
 
     static void scheduleAt(MinecraftServer server, int delayTicks, Runnable action) {
         scheduledTasks.add(new ScheduledTask(server.getTicks() + delayTicks, action));
+    }
+
+    // Places a block and tracks it for later cleanup
+    private static void place(ServerWorld world, int x, int y, int z, Block block, List<BlockPos> track) {
+        BlockPos pos = new BlockPos(x, y, z);
+        world.setBlockState(pos, block.getDefaultState(), 2);
+        track.add(pos);
     }
 
     @Override
@@ -66,52 +75,100 @@ public class PathogenesisMod implements ModInitializer {
             ServerPlayerEntity player = handler.player;
             ServerWorld world = player.getServerWorld();
 
+            // Save original position to TP back after cutscene
+            double origX = player.getX(), origY = player.getY(), origZ = player.getZ();
+            float origYaw = player.getYaw(), origPitch = player.getPitch();
+
+            // Hospital room is built high in the sky above the player's X/Z
+            int rx = player.getBlockX();
+            int ry = 280;
+            int rz = player.getBlockZ();
+
+            List<BlockPos> roomBlocks = new ArrayList<>();
+
+            // Checkered floor: white + light gray concrete (like hospital tile)
+            for (int x = rx-4; x <= rx+4; x++) {
+                for (int z = rz-4; z <= rz+4; z++) {
+                    Block b = ((x + z) % 2 == 0) ? Blocks.WHITE_CONCRETE : Blocks.LIGHT_GRAY_CONCRETE;
+                    place(world, x, ry-1, z, b, roomBlocks);
+                }
+            }
+
+            // White concrete ceiling
+            for (int x = rx-4; x <= rx+4; x++) {
+                for (int z = rz-4; z <= rz+4; z++) {
+                    place(world, x, ry+4, z, Blocks.WHITE_CONCRETE, roomBlocks);
+                }
+            }
+
+            // Sea lantern lights in ceiling
+            for (int[] off : new int[][]{{-2,-2},{2,-2},{-2,2},{2,2}}) {
+                place(world, rx+off[0], ry+4, rz+off[1], Blocks.SEA_LANTERN, roomBlocks);
+            }
+
+            // White concrete walls
+            for (int y = ry; y <= ry+3; y++) {
+                for (int x = rx-4; x <= rx+4; x++) {
+                    place(world, x, y, rz-4, Blocks.WHITE_CONCRETE, roomBlocks); // north wall
+                    place(world, x, y, rz+4, Blocks.WHITE_CONCRETE, roomBlocks); // south wall
+                }
+                for (int z = rz-3; z <= rz+3; z++) {
+                    place(world, rx+4, y, z, Blocks.WHITE_CONCRETE, roomBlocks); // east wall
+                    place(world, rx-4, y, z, Blocks.WHITE_CONCRETE, roomBlocks); // west wall
+                }
+            }
+
+            // Glass pane windows in south wall center (lets in sky light)
+            for (int x = rx-1; x <= rx+1; x++) {
+                place(world, x, ry+1, rz+4, Blocks.GLASS_PANE, roomBlocks);
+                place(world, x, ry+2, rz+4, Blocks.GLASS_PANE, roomBlocks);
+            }
+
+            // Hospital beds (white wool) in north corners
+            place(world, rx-3, ry,   rz-3, Blocks.WHITE_WOOL, roomBlocks);
+            place(world, rx-3, ry,   rz-2, Blocks.WHITE_WOOL, roomBlocks);
+            place(world, rx-3, ry+1, rz-3, Blocks.WHITE_WOOL, roomBlocks);
+            place(world, rx+3, ry,   rz-3, Blocks.WHITE_WOOL, roomBlocks);
+            place(world, rx+3, ry,   rz-2, Blocks.WHITE_WOOL, roomBlocks);
+            place(world, rx+3, ry+1, rz-3, Blocks.WHITE_WOOL, roomBlocks);
+
+            // Iron block "medical equipment" on east and west walls
+            place(world, rx+4, ry,   rz+1, Blocks.IRON_BLOCK, roomBlocks);
+            place(world, rx+4, ry+1, rz+1, Blocks.IRON_BLOCK, roomBlocks);
+            place(world, rx-4, ry,   rz+1, Blocks.IRON_BLOCK, roomBlocks);
+            place(world, rx-4, ry+1, rz+1, Blocks.IRON_BLOCK, roomBlocks);
+
+            // TP player into the room, facing north (toward the villagers)
+            player.networkHandler.requestTeleport(rx + 0.5, ry, rz + 0.5, 180f, 0f);
+
             // Darkness for the whole cutscene
             player.addStatusEffect(
-                new StatusEffectInstance(StatusEffects.DARKNESS, 260, 0, false, false));
+                new StatusEffectInstance(StatusEffects.DARKNESS, 380, 0, false, false));
 
-            // Spawn two villagers facing each other in front of the player
-            double yawRad = Math.toRadians(player.getYaw());
-            double fwdX  = -Math.sin(yawRad);
-            double fwdZ  =  Math.cos(yawRad);
-            double rgtX  =  Math.cos(yawRad);
-            double rgtZ  =  Math.sin(yawRad);
-
-            // Doc432 — cleric (medical), stands to the LEFT
+            // Spawn villagers facing each other north of center
+            // Doc432 — WEST side, facing EAST (toward Biotech)
             VillagerEntity doc = new VillagerEntity(EntityType.VILLAGER, world);
-            doc.setPos(player.getX() + fwdX * 4 - rgtX * 1.5,
-                       player.getY(),
-                       player.getZ() + fwdZ * 4 - rgtZ * 1.5);
+            doc.setPos(rx - 1.5, ry, rz - 1.0);
             doc.setCustomName(Text.literal("Doc432").formatted(Formatting.AQUA, Formatting.BOLD));
             doc.setCustomNameVisible(true);
             doc.setAiDisabled(true);
             doc.setInvulnerable(true);
             doc.setSilent(true);
-            doc.getVillagerData().withProfession(VillagerProfession.CLERIC);
-            float docFacing = player.getYaw() + 90f; // faces right (toward Biotech)
-            doc.setYaw(docFacing);
-            doc.setBodyYaw(docFacing);
-            doc.setHeadYaw(docFacing);
+            doc.setYaw(-90f); doc.setBodyYaw(-90f); doc.setHeadYaw(-90f); // face east
             world.spawnEntity(doc);
 
-            // Biotech92130 — cartographer (scientist), stands to the RIGHT
+            // Biotech92130 — EAST side, facing WEST (toward Doc)
             VillagerEntity bio = new VillagerEntity(EntityType.VILLAGER, world);
-            bio.setPos(player.getX() + fwdX * 4 + rgtX * 1.5,
-                       player.getY(),
-                       player.getZ() + fwdZ * 4 + rgtZ * 1.5);
+            bio.setPos(rx + 1.5, ry, rz - 1.0);
             bio.setCustomName(Text.literal("Biotech92130").formatted(Formatting.GREEN, Formatting.BOLD));
             bio.setCustomNameVisible(true);
             bio.setAiDisabled(true);
             bio.setInvulnerable(true);
             bio.setSilent(true);
-            bio.getVillagerData().withProfession(VillagerProfession.CARTOGRAPHER);
-            float bioFacing = player.getYaw() - 90f; // faces left (toward Doc)
-            bio.setYaw(bioFacing);
-            bio.setBodyYaw(bioFacing);
-            bio.setHeadYaw(bioFacing);
+            bio.setYaw(90f); bio.setBodyYaw(90f); bio.setHeadYaw(90f); // face west
             world.spawnEntity(bio);
 
-            // Dialogue lines — title = speaker name, subtitle = their line
+            // Dialogue lines
             Runnable[] lines = {
                 () -> {
                     player.networkHandler.sendPacket(new TitleFadeS2CPacket(5, 45, 5));
@@ -150,10 +207,9 @@ public class PathogenesisMod implements ModInitializer {
                         SoundEvents.ENTITY_VILLAGER_WORK_CARTOGRAPHER, SoundCategory.MASTER, 0.8f, 0.85f);
                 },
                 () -> {
-                    // Despawn the two villagers just before the big title
+                    // Villagers disappear just before the big title
                     doc.discard();
                     bio.discard();
-
                     player.networkHandler.sendPacket(new TitleFadeS2CPacket(20, 80, 20));
                     player.networkHandler.sendPacket(new TitleS2CPacket(
                         Text.literal("PATHOGENESIS").formatted(Formatting.DARK_RED, Formatting.BOLD)));
@@ -169,6 +225,15 @@ public class PathogenesisMod implements ModInitializer {
                 final Runnable line = lines[i];
                 scheduleAt(server, delays[i], line);
             }
+
+            // After the PATHOGENESIS title fades out: remove the room and TP player back
+            scheduleAt(server, 355, () -> {
+                if (!player.isAlive()) return;
+                for (BlockPos pos : roomBlocks) {
+                    world.setBlockState(pos, Blocks.AIR.getDefaultState(), 2);
+                }
+                player.networkHandler.requestTeleport(origX, origY, origZ, origYaw, origPitch);
+            });
         });
 
         LOGGER.info("Pathogenesis mod ready. Pathogens incoming!");
