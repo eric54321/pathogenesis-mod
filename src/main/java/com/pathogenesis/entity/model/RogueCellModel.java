@@ -86,14 +86,16 @@ public class RogueCellModel extends EntityModel<RogueCellEntity> {
             p.yaw = spin;
         }
 
-        // Lash animation on 60-tick cycle
-        // 0–0.10 → snap out hard (very fast), 0.10–0.30 → slowly retract, rest until next cycle
+        // Continuous slow wave so tentacles are always moving
+        float wave = (float)Math.sin(animationProgress * 0.08f) * 0.35f;
+
+        // Lash animation on 60-tick cycle — snap out hard, slowly retract
         float cycle = (animationProgress % 60f) / 60f;
         float lashFactor = (cycle < 0.10f) ? cycle / 0.10f
                          : (cycle < 0.30f) ? 1f - (cycle - 0.10f) / 0.20f
                          : 0f;
-        // rest: heavily drooped (+0.9 rad ≈ 52°), lash: snap far forward/upward (-1.1 rad)
-        float tentPitch = 0.9f - lashFactor * 2.0f;
+        // base droop + wave + dramatic lash snap
+        float tentPitch = 0.5f + wave - lashFactor * 2.0f;
 
         setTentacleAngles(tentNb, tentNm, tentNt, spin,                              tentPitch);
         setTentacleAngles(tentSb, tentSm, tentSt, spin + (float)Math.PI,             tentPitch);
