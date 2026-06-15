@@ -3,6 +3,7 @@ package com.pathogenesis.init;
 import com.pathogenesis.PathogenesisMod;
 import com.pathogenesis.entity.CoronavirusEntity;
 import com.pathogenesis.entity.InfluenzaEntity;
+import com.pathogenesis.entity.PhageEntity;
 import com.pathogenesis.entity.RogueCellEntity;
 import com.pathogenesis.entity.VironEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -69,6 +70,19 @@ public class ModEntities {
     );
 
     /**
+     * Bacteriophage — alien lander-shaped virus with icosahedral head, tail shaft,
+     * and 4 landing legs. Slow but hits hard and injects Poison (DNA corruption).
+     * Appears in waves 4+ as a mid-to-late precision threat.
+     */
+    public static final EntityType<PhageEntity> PHAGE = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(PathogenesisMod.MOD_ID, "phage"),
+        EntityType.Builder.create(PhageEntity::new, SpawnGroup.MONSTER)
+            .dimensions(0.6f, 1.2f)
+            .build()
+    );
+
+    /**
      * Called from PathogenesisMod.onInitialize().
      * Registers entity attribute sets (health, speed, damage) for each mob.
      * Without this call the game will crash when the entity tries to spawn.
@@ -78,6 +92,7 @@ public class ModEntities {
         FabricDefaultAttributeRegistry.register(VIRON, VironEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(INFLUENZA, InfluenzaEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(CORONAVIRUS, CoronavirusEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(PHAGE, PhageEntity.createAttributes());
 
         PathogenesisMod.LOGGER.info("Pathogenesis entities registered.");
     }

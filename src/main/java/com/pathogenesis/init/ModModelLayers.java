@@ -15,4 +15,7 @@ public class ModModelLayers {
 
     public static final EntityModelLayer CORONAVIRUS =
         new EntityModelLayer(Identifier.of("pathogenesis", "coronavirus"), "main");
+
+    public static final EntityModelLayer PHAGE =
+        new EntityModelLayer(Identifier.of("pathogenesis", "phage"), "main");
 }

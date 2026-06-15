@@ -3,6 +3,7 @@ package com.pathogenesis.system;
 import com.pathogenesis.PathogenesisMod;
 import com.pathogenesis.entity.CoronavirusEntity;
 import com.pathogenesis.entity.InfluenzaEntity;
+import com.pathogenesis.entity.PhageEntity;
 import com.pathogenesis.entity.RogueCellEntity;
 import com.pathogenesis.entity.VironEntity;
 import com.pathogenesis.init.ModEntities;
@@ -187,16 +188,17 @@ public class WaveSpawner {
             );
 
             // Pick enemy type based on wave number:
-            //   Wave 1-2:  RogueCell (cancer) + Viron (basic virus)
+            //   Wave 1-2:  RogueCell + Viron
             //   Wave 3-4:  add Influenza
-            //   Wave 5+:   add Coronavirus
-            // Within each wave, alternate between types for variety.
+            //   Wave 5-6:  add Coronavirus
+            //   Wave 7+:   add Bacteriophage (precision, high damage)
             net.minecraft.entity.mob.MobEntity enemy;
             int type = pickEnemyType(i, totalEnemies);
             enemy = switch (type) {
                 case 1 -> new VironEntity(ModEntities.VIRON, world);
                 case 2 -> new InfluenzaEntity(ModEntities.INFLUENZA, world);
                 case 3 -> new CoronavirusEntity(ModEntities.CORONAVIRUS, world);
+                case 4 -> new PhageEntity(ModEntities.PHAGE, world);
                 default -> new RogueCellEntity(ModEntities.ROGUE_CELL, world);
             };
             enemy.refreshPositionAndAngles(spawnX, spawnY, spawnZ, 0.0f, 0.0f);
@@ -225,11 +227,17 @@ public class WaveSpawner {
             if (slot < 8) return 0;              // 40% RogueCell
             if (slot < 14) return 1;             // 30% Viron
             return 2;                            // 30% Influenza
-        } else {
+        } else if (waveNumber <= 6) {
             if (slot < 5)  return 0;             // 25% RogueCell
             if (slot < 10) return 1;             // 25% Viron
             if (slot < 15) return 2;             // 25% Influenza
             return 3;                            // 25% Coronavirus
+        } else {
+            if (slot < 5)  return 0;             // 25% RogueCell
+            if (slot < 10) return 1;             // 25% Viron
+            if (slot < 14) return 3;             // 20% Coronavirus
+            if (slot < 18) return 2;             // 20% Influenza
+            return 4;                            // 10% Bacteriophage — rare, devastating
         }
     }
 
