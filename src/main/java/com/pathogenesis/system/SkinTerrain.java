@@ -13,7 +13,7 @@ import java.util.Random;
 public class SkinTerrain {
 
     private static final int RADIUS = 300;       // 600x600 skin area
-    private static final int CLEAR_RADIUS = 500; // surrounding terrain wiped out to this radius
+    private static final int CLEAR_RADIUS = 360; // surrounding terrain wiped in all directions
 
     public static void register() {
         ServerLifecycleEvents.SERVER_STARTED.register(SkinTerrain::onServerStart);
@@ -34,14 +34,15 @@ public class SkinTerrain {
         state.setSkinTerrainBuilt(true);
     }
 
-    // Wipe all normal terrain in the surrounding ring down to bedrock level
+    // Wipe all terrain outside the skin in a 360-block radius in every direction
     private static void clearSurroundings(ServerWorld world, int cx, int cy, int cz) {
-        int minY = world.getBottomY() + 1; // just above bedrock
+        int minY = cy - CLEAR_RADIUS;
+        int maxY = cy + CLEAR_RADIUS;
         for (int x = -CLEAR_RADIUS; x <= CLEAR_RADIUS; x++) {
             for (int z = -CLEAR_RADIUS; z <= CLEAR_RADIUS; z++) {
                 // Skip the skin area itself — generate() handles that
                 if (Math.abs(x) <= RADIUS && Math.abs(z) <= RADIUS) continue;
-                for (int y = minY; y <= cy + 30; y++) {
+                for (int y = minY; y <= maxY; y++) {
                     place(world, cx + x, y, cz + z, Blocks.AIR);
                 }
             }
