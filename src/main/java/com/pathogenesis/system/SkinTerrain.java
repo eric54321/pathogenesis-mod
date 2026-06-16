@@ -12,7 +12,8 @@ import java.util.Random;
 
 public class SkinTerrain {
 
-    private static final int RADIUS = 300; // 600x600 block area
+    private static final int RADIUS = 300;       // 600x600 skin area
+    private static final int CLEAR_RADIUS = 500; // surrounding terrain wiped out to this radius
 
     public static void register() {
         ServerLifecycleEvents.SERVER_STARTED.register(SkinTerrain::onServerStart);
@@ -28,8 +29,23 @@ public class SkinTerrain {
         int cz = spawn.getZ();
         int cy = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, cx, cz);
 
+        clearSurroundings(world, cx, cy, cz);
         generate(world, cx, cy, cz);
         state.setSkinTerrainBuilt(true);
+    }
+
+    // Wipe all normal terrain in the surrounding ring down to bedrock level
+    private static void clearSurroundings(ServerWorld world, int cx, int cy, int cz) {
+        int minY = world.getBottomY() + 1; // just above bedrock
+        for (int x = -CLEAR_RADIUS; x <= CLEAR_RADIUS; x++) {
+            for (int z = -CLEAR_RADIUS; z <= CLEAR_RADIUS; z++) {
+                // Skip the skin area itself — generate() handles that
+                if (Math.abs(x) <= RADIUS && Math.abs(z) <= RADIUS) continue;
+                for (int y = minY; y <= cy + 30; y++) {
+                    place(world, cx + x, y, cz + z, Blocks.AIR);
+                }
+            }
+        }
     }
 
     private static void generate(ServerWorld world, int cx, int cy, int cz) {
