@@ -13,10 +13,9 @@ import java.util.Random;
 public class SkinTerrain {
 
     private static final int RADIUS      = 300; // 600x600 skin (patient body)
-    private static final int DRAPE       = 330; // light blue surgical draping border
-    private static final int ROOM_RADIUS = 460; // surgery room walls
-    private static final int ROOM_HEIGHT = 50;  // wall + ceiling height
-    private static final int CLEAR_RADIUS = 480; // void beyond the room
+    private static final int DRAPE       = 320; // light blue surgical draping border
+    private static final int ROOM_RADIUS = 380; // surgery room walls
+    private static final int ROOM_HEIGHT = 30;  // wall + ceiling height
 
     public static void register() {
         ServerLifecycleEvents.SERVER_STARTED.register(SkinTerrain::onServerStart);
@@ -32,26 +31,12 @@ public class SkinTerrain {
         int cz = spawn.getZ();
         int cy = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, cx, cz);
 
-        clearAll(world, cx, cy, cz);
         generateSkin(world, cx, cy, cz);
         buildSurgeryRoom(world, cx, cy, cz);
         state.setSkinTerrainBuilt(true);
     }
 
-    // ── Step 1: wipe everything in the zone to air ─────────────────────────
-    private static void clearAll(ServerWorld world, int cx, int cy, int cz) {
-        int minY = cy - 20;
-        int maxY = cy + ROOM_HEIGHT + 5;
-        for (int x = -CLEAR_RADIUS; x <= CLEAR_RADIUS; x++) {
-            for (int z = -CLEAR_RADIUS; z <= CLEAR_RADIUS; z++) {
-                for (int y = minY; y <= maxY; y++) {
-                    place(world, cx + x, y, cz + z, Blocks.AIR);
-                }
-            }
-        }
-    }
-
-    // ── Step 2: build the fleshy skin terrain (patient body) ───────────────
+    // ── Step 1: build the fleshy skin terrain (patient body) ───────────────
     private static void generateSkin(ServerWorld world, int cx, int cy, int cz) {
         Random rand = new Random(12345L);
 
@@ -155,20 +140,22 @@ public class SkinTerrain {
         int R = ROOM_RADIUS;
         int H = ROOM_HEIGHT;
 
-        // ── Surgical draping border (light blue concrete between skin and OR floor)
-        for (int x = -DRAPE; x <= DRAPE; x++) {
-            for (int z = -DRAPE; z <= DRAPE; z++) {
-                if (Math.abs(x) > RADIUS || Math.abs(z) > RADIUS) {
-                    place(world, cx + x, cy,     cz + z, Blocks.LIGHT_BLUE_CONCRETE);
-                    place(world, cx + x, cy - 1, cz + z, Blocks.LIGHT_BLUE_CONCRETE);
-                }
-            }
-        }
-
-        // ── OR floor (white + light gray tiled checkerboard)
+        // ── Clear the room interior and lay floor in one pass ──────────────
         for (int x = -R; x <= R; x++) {
             for (int z = -R; z <= R; z++) {
-                if (Math.abs(x) > DRAPE || Math.abs(z) > DRAPE) {
+                // Clear air above from surface to ceiling
+                for (int y = cy + 1; y <= cy + H; y++) {
+                    place(world, cx + x, y, cz + z, Blocks.AIR);
+                }
+
+                if (Math.abs(x) <= RADIUS && Math.abs(z) <= RADIUS) {
+                    // Inside skin area — skin generation handles the floor
+                } else if (Math.abs(x) <= DRAPE && Math.abs(z) <= DRAPE) {
+                    // Surgical draping border
+                    place(world, cx + x, cy,     cz + z, Blocks.LIGHT_BLUE_CONCRETE);
+                    place(world, cx + x, cy - 1, cz + z, Blocks.LIGHT_BLUE_CONCRETE);
+                } else {
+                    // OR floor tiles
                     boolean isGrout = (x % 4 == 0 || z % 4 == 0);
                     place(world, cx + x, cy, cz + z,
                         isGrout ? Blocks.LIGHT_GRAY_CONCRETE : Blocks.WHITE_CONCRETE);
