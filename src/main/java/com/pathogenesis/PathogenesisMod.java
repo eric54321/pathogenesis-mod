@@ -4,6 +4,7 @@ import com.pathogenesis.init.ModEntities;
 import com.pathogenesis.init.ModItems;
 import com.pathogenesis.system.BossArena;
 import com.pathogenesis.system.HostHealth;
+import com.pathogenesis.system.SkinTerrain;
 import com.pathogenesis.system.WaveSpawner;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -60,6 +61,7 @@ public class PathogenesisMod implements ModInitializer {
         WaveSpawner.register();
         HostHealth.register();
         BossArena.register();
+        SkinTerrain.register();
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             long now = server.getTicks();
