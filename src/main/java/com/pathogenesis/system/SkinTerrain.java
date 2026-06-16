@@ -182,34 +182,33 @@ public class SkinTerrain {
             }
         }
 
-        // ── Surgical overhead lights (large sea lantern discs on ceiling)
-        // 9 lights: center + 4 main + 4 diagonal
-        int[][] lights = {
-            {0, 0}, {-170, 0}, {170, 0}, {0, -170}, {0, 170},
-            {-170, -170}, {170, -170}, {-170, 170}, {170, 170}
-        };
-        for (int[] lp : lights) {
-            // Outer ring on ceiling
-            for (int dx = -12; dx <= 12; dx++) {
-                for (int dz = -12; dz <= 12; dz++) {
-                    if (dx * dx + dz * dz <= 144) {
-                        place(world, cx + lp[0] + dx, cy + H + 1, cz + lp[1] + dz, Blocks.SEA_LANTERN);
+        // ── Surgical overhead lights — 25 lights in a 5x5 grid, widely spread
+        for (int gx = -2; gx <= 2; gx++) {
+            for (int gz = -2; gz <= 2; gz++) {
+                int lx = cx + gx * 140;
+                int lz = cz + gz * 140;
+                // Wide disc on ceiling (radius 20)
+                for (int dx = -20; dx <= 20; dx++) {
+                    for (int dz = -20; dz <= 20; dz++) {
+                        if (dx * dx + dz * dz <= 400) {
+                            place(world, lx + dx, cy + H + 1, lz + dz, Blocks.SEA_LANTERN);
+                        }
                     }
                 }
-            }
-            // Hanging fixture one block below ceiling
-            for (int dx = -8; dx <= 8; dx++) {
-                for (int dz = -8; dz <= 8; dz++) {
-                    if (dx * dx + dz * dz <= 64) {
-                        place(world, cx + lp[0] + dx, cy + H, cz + lp[1] + dz, Blocks.SEA_LANTERN);
+                // Hanging tier 1 (radius 14)
+                for (int dx = -14; dx <= 14; dx++) {
+                    for (int dz = -14; dz <= 14; dz++) {
+                        if (dx * dx + dz * dz <= 196) {
+                            place(world, lx + dx, cy + H, lz + dz, Blocks.SEA_LANTERN);
+                        }
                     }
                 }
-            }
-            // Bright central core two below ceiling
-            for (int dx = -4; dx <= 4; dx++) {
-                for (int dz = -4; dz <= 4; dz++) {
-                    if (dx * dx + dz * dz <= 16) {
-                        place(world, cx + lp[0] + dx, cy + H - 1, cz + lp[1] + dz, Blocks.SEA_LANTERN);
+                // Hanging tier 2 / bright core (radius 8)
+                for (int dx = -8; dx <= 8; dx++) {
+                    for (int dz = -8; dz <= 8; dz++) {
+                        if (dx * dx + dz * dz <= 64) {
+                            place(world, lx + dx, cy + H - 1, lz + dz, Blocks.SEA_LANTERN);
+                        }
                     }
                 }
             }
