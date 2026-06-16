@@ -29,8 +29,7 @@ public class AnthraxBladeItem extends SwordItem {
             .add(EntityAttributes.GENERIC_ATTACK_DAMAGE,
                 new EntityAttributeModifier(
                     Identifier.of("pathogenesis", "anthrax_blade_damage"),
-                    // 20 base attack damage (netherite sword normally gives 8)
-                    20.0,
+                    11.0,
                     EntityAttributeModifier.Operation.ADD_VALUE),
                 AttributeModifierSlot.MAINHAND)
             .add(EntityAttributes.GENERIC_ATTACK_SPEED,
