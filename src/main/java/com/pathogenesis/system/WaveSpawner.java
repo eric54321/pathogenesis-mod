@@ -17,6 +17,8 @@ import com.pathogenesis.entity.VironEntity;
 import com.pathogenesis.init.ModEntities;
 import com.pathogenesis.init.ModItems;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -112,6 +114,14 @@ public class WaveSpawner {
         }
 
         ticksUntilNextWave--;
+
+        // Refresh Night Vision every 5 seconds so the surgery room is always bright
+        if (ticksUntilNextWave % 100 == 0) {
+            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+                player.addStatusEffect(new StatusEffectInstance(
+                    StatusEffects.NIGHT_VISION, 300, 0, false, false));
+            }
+        }
 
         if (ticksUntilNextWave <= 0) {
             // Reset the timer BEFORE spawning so lag during spawning doesn't shorten the next interval
