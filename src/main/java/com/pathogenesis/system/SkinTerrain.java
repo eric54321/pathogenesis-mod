@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class SkinTerrain {
 
-    private static final int RADIUS = 90; // 180x180 block area
+    private static final int RADIUS = 900; // 1800x1800 block area
 
     public static void register() {
         ServerLifecycleEvents.SERVER_STARTED.register(SkinTerrain::onServerStart);
@@ -63,7 +63,7 @@ public class SkinTerrain {
         }
 
         // ── Hair follicles (brown terracotta pillars) ──────────────────────
-        for (int i = 0; i < 55; i++) {
+        for (int i = 0; i < 550; i++) {
             int hx = cx + rand.nextInt(RADIUS * 2) - RADIUS;
             int hz = cz + rand.nextInt(RADIUS * 2) - RADIUS;
             int height = 3 + rand.nextInt(5);
@@ -77,7 +77,7 @@ public class SkinTerrain {
         }
 
         // ── Pores (small surface holes exposing dermis below) ──────────────
-        for (int i = 0; i < 35; i++) {
+        for (int i = 0; i < 350; i++) {
             int px = cx + rand.nextInt(RADIUS * 2) - RADIUS;
             int pz = cz + rand.nextInt(RADIUS * 2) - RADIUS;
             int size = rand.nextBoolean() ? 0 : 1; // 1x1 or 2x2
@@ -92,7 +92,7 @@ public class SkinTerrain {
         }
 
         // ── Infection wounds (crimson patches — bacteria entry points) ──────
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 70; i++) {
             int wx = cx + rand.nextInt(RADIUS * 2) - RADIUS;
             int wz = cz + rand.nextInt(RADIUS * 2) - RADIUS;
             int r = 4 + rand.nextInt(6);
@@ -115,7 +115,7 @@ public class SkinTerrain {
         }
 
         // ── Sebaceous glands (slime chambers just below surface) ───────────
-        for (int i = 0; i < 14; i++) {
+        for (int i = 0; i < 140; i++) {
             int gx = cx + rand.nextInt(RADIUS * 2) - RADIUS;
             int gz = cz + rand.nextInt(RADIUS * 2) - RADIUS;
             // 3x3 shell, hollow inside
@@ -129,7 +129,7 @@ public class SkinTerrain {
         }
 
         // ── Cell nuclei lighting (sea lanterns deep below — cells glowing) ─
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 400; i++) {
             int lx = cx + rand.nextInt(RADIUS * 2) - RADIUS;
             int lz = cz + rand.nextInt(RADIUS * 2) - RADIUS;
             place(world, lx, cy - 5, lz, Blocks.SEA_LANTERN);
@@ -151,7 +151,7 @@ public class SkinTerrain {
         }
 
         // ── Sweat gland openings (blue-green tinted holes) ─────────────────
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             int sx = cx + rand.nextInt(RADIUS * 2) - RADIUS;
             int sz = cz + rand.nextInt(RADIUS * 2) - RADIUS;
             place(world, sx, cy,     sz, Blocks.CYAN_TERRACOTTA);
