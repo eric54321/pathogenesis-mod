@@ -66,9 +66,45 @@ Parasites ingested through contaminated food. All three grow larger the longer t
 | Bacteriophage | Slow, high damage, applies Poison. Rare precision threat |
 | RogueCell | Cancer cell. Splits into 2 weaker copies on death |
 
+### Skin Terrain
+
+On first world load, the game generates a 600×600 block fleshy skin surface centered on spawn. All normal Minecraft terrain in a 1000×1000 ring around it is wiped to void so the skin sits alone.
+
+The terrain is layered like real skin:
+
+| Layer | Blocks | Depth |
+|---|---|---|
+| Epidermis (surface) | Pink terracotta + pink concrete powder | Top |
+| Dermis | Red terracotta | −1 to −2 |
+| Subcutaneous fat | Yellow terracotta + honey blocks | −3 to −6 |
+
+Surface features scattered across the terrain:
+
+- **Hair follicles** — brown terracotta pillars 3–7 blocks tall, some topped with dead bush tufts
+- **Pores** — small 1×1 and 2×2 holes punched through to the dermis below
+- **Infection wounds** — crimson nylium patches with crimson roots and magma cores, marking where pathogens entered
+- **Sebaceous glands** — hollow slime block chambers just below the surface
+- **Surface veins** — red concrete lines running N–S and E–W across the terrain
+- **Sweat gland openings** — cyan terracotta holes in the surface
+- **Cell nuclei** — sea lanterns glowing deep below the surface, visible through pores at night
+
+### Pathogen Lair & Boss
+
+At wave 5, players receive a **Pathogen Tracker** item showing the coordinates of the Pathogen Lair, built 600 blocks north of spawn. When a player approaches within 35 blocks, **Bacillus Anthracis** spawns — a massive two-phase bacterial boss with 400 HP and a green boss bar.
+
+- **Phase 1 (green):** Toxin Cloud, Spore Burst, Ground Slam, Charge attack
+- **Phase 2 (blue, triggers at 50% HP):** Heals to full, switches to Lightning Storm, Frost Nova, Radiant Pulse, Plasma Volley
+- **On death:** drops the **Anthrax Blade** — a unique weapon with 11 base attack, Poison III + Wither II + Slowness III + Weakness II on hit, and +15 bonus magic damage per strike
+
+The boss does not respawn after being defeated. Its defeated state is saved across server restarts.
+
 ### Items
 
 **CAR-T Injector** — One-use item. Permanently increases attack damage by 4. Based on real CAR-T cell immunotherapy used in cancer treatment.
+
+**Pathogen Tracker** — Given to all players at wave 5. Shows the X/Y/Z coordinates of the Pathogen Lair and the full `/tp` command to reach it.
+
+**Anthrax Blade** — Unique drop from Bacillus Anthracis. 11 base attack damage. On every hit: Poison III (8s), Wither II (6s), Slowness III (4s), Weakness II (5s), +15 bonus magic damage bypassing armor. Has an enchantment glint.
 
 ---
 
