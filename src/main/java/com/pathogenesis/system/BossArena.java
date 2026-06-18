@@ -39,6 +39,8 @@ public class BossArena {
 
     private static void onServerStart(MinecraftServer server) {
         currentServer = server;
+        // Disable all vanilla mob spawning — only pathogenesis enemies should exist
+        server.getGameRules().get(net.minecraft.world.GameRules.DO_MOB_SPAWNING).set(false, server);
         ServerWorld world = server.getOverworld();
         ArenaPersistentState state = ArenaPersistentState.getOrCreate(world);
         // Restore defeated flag across restarts

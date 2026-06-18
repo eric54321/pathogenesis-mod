@@ -203,15 +203,39 @@ public class SkinTerrain {
                         }
                     }
                 }
-                // Hanging tier 2 / bright core (radius 8)
-                for (int dx = -8; dx <= 8; dx++) {
-                    for (int dz = -8; dz <= 8; dz++) {
-                        if (dx * dx + dz * dz <= 64) {
+                // Hanging tier 2 (radius 10)
+                for (int dx = -10; dx <= 10; dx++) {
+                    for (int dz = -10; dz <= 10; dz++) {
+                        if (dx * dx + dz * dz <= 100) {
                             place(world, lx + dx, cy + H - 1, lz + dz, Blocks.SEA_LANTERN);
                         }
                     }
                 }
+                // Hanging tier 3 — drops halfway to the floor (radius 6)
+                for (int dx = -6; dx <= 6; dx++) {
+                    for (int dz = -6; dz <= 6; dz++) {
+                        if (dx * dx + dz * dz <= 36) {
+                            place(world, lx + dx, cy + H / 2, lz + dz, Blocks.SEA_LANTERN);
+                        }
+                    }
+                }
+                // Bright core — hangs low, just above head height (radius 3)
+                for (int dx = -3; dx <= 3; dx++) {
+                    for (int dz = -3; dz <= 3; dz++) {
+                        if (dx * dx + dz * dz <= 9) {
+                            place(world, lx + dx, cy + 4, lz + dz, Blocks.SEA_LANTERN);
+                        }
+                    }
+                }
             }
+        }
+
+        // ── Floor-level glow strips along the walls for ambient fill light
+        for (int t = -R + 5; t <= R - 5; t += 20) {
+            place(world, cx + t, cy + 1, cz - R + 1, Blocks.SEA_LANTERN);
+            place(world, cx + t, cy + 1, cz + R - 1, Blocks.SEA_LANTERN);
+            place(world, cx - R + 1, cy + 1, cz + t, Blocks.SEA_LANTERN);
+            place(world, cx + R - 1, cy + 1, cz + t, Blocks.SEA_LANTERN);
         }
 
         // ── Quartz pillar columns at corners (3x3 cross-section)
