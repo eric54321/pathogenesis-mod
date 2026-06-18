@@ -17,15 +17,20 @@ import com.pathogenesis.entity.VironEntity;
 import com.pathogenesis.init.ModEntities;
 import com.pathogenesis.init.ModItems;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.Heightmap;
 
 import java.util.List;
@@ -120,6 +125,40 @@ public class WaveSpawner {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 player.addStatusEffect(new StatusEffectInstance(
                     StatusEffects.NIGHT_VISION, 300, 0, false, false));
+            }
+        }
+
+        // Remove vanilla mobs from skin area every 5 seconds
+        if (ticksUntilNextWave % 100 == 50) {
+            ServerWorld world = server.getOverworld();
+            BlockPos spawn = world.getSpawnPos();
+            int r = 300;
+            Box skinBox = new Box(spawn.getX() - r, -64, spawn.getZ() - r,
+                                  spawn.getX() + r, 320, spawn.getZ() + r);
+            for (Entity entity : world.getEntitiesByClass(LivingEntity.class, skinBox, e -> {
+                if (e instanceof PlayerEntity) return false;
+                String namespace = Registries.ENTITY_TYPE.getId(e.getType()).getNamespace();
+                return !namespace.equals("pathogenesis");
+            })) {
+                entity.discard();
+            }
+        }
+
+        // Ambient skin spawn: 2 enemies every 10 seconds between waves
+        if (ticksUntilNextWave % 200 == 0) {
+            List<ServerPlayerEntity> players = server.getPlayerManager().getPlayerList();
+            if (!players.isEmpty()) {
+                for (int i = 0; i < 2; i++) {
+                    ServerPlayerEntity target = players.get(i % players.size());
+                    ServerWorld world = target.getServerWorld();
+                    double angle = Math.random() * 2.0 * Math.PI;
+                    double dist = SPAWN_RADIUS_MIN + Math.random() * (SPAWN_RADIUS_MAX - SPAWN_RADIUS_MIN);
+                    double sx = target.getX() + Math.cos(angle) * dist;
+                    double sz = target.getZ() + Math.sin(angle) * dist;
+                    double sy = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, (int) sx, (int) sz);
+                    int type = pickEnemyType(i);
+                    spawnAtPosition(world, type, sx, sy, sz);
+                }
             }
         }
 
