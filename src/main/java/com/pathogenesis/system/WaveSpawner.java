@@ -138,6 +138,8 @@ public class WaveSpawner {
             for (Entity entity : world.getEntitiesByClass(LivingEntity.class, skinBox, e -> {
                 if (e instanceof PlayerEntity) return false;
                 String namespace = Registries.ENTITY_TYPE.getId(e.getType()).getNamespace();
+                // Keep villagers (cutscene characters)
+                if (e instanceof net.minecraft.entity.passive.VillagerEntity) return false;
                 return !namespace.equals("pathogenesis");
             })) {
                 entity.discard();
