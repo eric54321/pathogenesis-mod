@@ -24,12 +24,11 @@ public class ParkourCourse {
         ArenaPersistentState state = ArenaPersistentState.getOrCreate(world);
         if (state.isParkourBuilt()) return;
 
-        BlockPos center = state.getCenter();
-        int cx = center.getX();
-        int cz = center.getZ();
-        // Use saved skin floor Y; fall back to heightmap if terrain not yet built
-        int cy = (center.getY() != 0) ? center.getY()
-                : world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, cx, cz);
+        BlockPos spawn = world.getSpawnPos();
+        int cx = spawn.getX();
+        int cz = spawn.getZ();
+        // Heightmap returns the surgery room ceiling; subtract room height to get the floor
+        int cy = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, cx, cz) - 30;
 
         build(world, cx, cy, cz);
         state.setParkourBuilt(true);
