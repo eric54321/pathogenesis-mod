@@ -14,6 +14,9 @@
   "item.pathogenesis.cart_injector": "CAR-T Injector",
   "item.pathogenesis.anthrax_blade": "Anthrax Blade",
   "item.pathogenesis.pathogen_tracker": "Pathogen Tracker",
+  "item.pathogenesis.antibody_sword": "Antibody Blade",
+  "item.pathogenesis.healing_shield": "Healing Shield",
+  "item.pathogenesis.antibody_shot": "Antibody Shot",
   "item.pathogenesis.cart_injector.tooltip1": "Reprograms your T-cells to permanently seek and destroy cancer cells.",
   "item.pathogenesis.cart_injector.tooltip2": "Permanently increases attack damage. One use only.",
   "itemGroup.pathogenesis.main": "Pathogenesis"

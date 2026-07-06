@@ -2,7 +2,10 @@ package com.pathogenesis.init;
 
 import com.pathogenesis.PathogenesisMod;
 import com.pathogenesis.item.AnthraxBladeItem;
+import com.pathogenesis.item.AntibodyShotItem;
+import com.pathogenesis.item.AntibodySwordItem;
 import com.pathogenesis.item.CARTInjectorItem;
+import com.pathogenesis.item.HealingShieldItem;
 import com.pathogenesis.item.PathogenTrackerItem;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
@@ -41,6 +44,24 @@ public class ModItems {
         new PathogenTrackerItem(new Item.Settings().maxCount(1))
     );
 
+    public static final AntibodySwordItem ANTIBODY_SWORD = Registry.register(
+        Registries.ITEM,
+        Identifier.of(PathogenesisMod.MOD_ID, "antibody_sword"),
+        new AntibodySwordItem(new Item.Settings().maxCount(1))
+    );
+
+    public static final HealingShieldItem HEALING_SHIELD = Registry.register(
+        Registries.ITEM,
+        Identifier.of(PathogenesisMod.MOD_ID, "healing_shield"),
+        new HealingShieldItem(new Item.Settings().maxCount(1))
+    );
+
+    public static final AntibodyShotItem ANTIBODY_SHOT = Registry.register(
+        Registries.ITEM,
+        Identifier.of(PathogenesisMod.MOD_ID, "antibody_shot"),
+        new AntibodyShotItem(new Item.Settings().maxCount(32))
+    );
+
     /**
      * Called from PathogenesisMod.onInitialize().
      * Adds our items to the Medicine & Potions creative tab so testers
@@ -52,6 +73,9 @@ public class ModItems {
             entries.add(CART_INJECTOR);
             entries.add(PATHOGEN_TRACKER);
             entries.add(ANTHRAX_BLADE);
+            entries.add(ANTIBODY_SWORD);
+            entries.add(HEALING_SHIELD);
+            entries.add(ANTIBODY_SHOT);
         });
 
         PathogenesisMod.LOGGER.info("Pathogenesis items registered.");

@@ -4,6 +4,7 @@ import com.pathogenesis.init.ModEntities;
 import com.pathogenesis.init.ModItems;
 import com.pathogenesis.system.BossArena;
 import com.pathogenesis.system.HostHealth;
+import com.pathogenesis.system.ParkourCourse;
 import com.pathogenesis.system.SkinTerrain;
 import com.pathogenesis.system.WaveSpawner;
 import net.fabricmc.api.ModInitializer;
@@ -14,6 +15,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
@@ -62,6 +64,7 @@ public class PathogenesisMod implements ModInitializer {
         HostHealth.register();
         BossArena.register();
         SkinTerrain.register();
+        ParkourCourse.register();
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             long now = server.getTicks();

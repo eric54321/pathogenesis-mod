@@ -28,10 +28,12 @@ public class PathogenTrackerItem extends Item {
                 );
                 user.sendMessage(Text.literal("☣ Pathogen signal detected!")
                     .formatted(Formatting.DARK_GREEN, Formatting.BOLD), false);
-                user.sendMessage(Text.literal("  → Coordinates: X=" + center.getX() + ", Z=" + center.getZ())
+                user.sendMessage(Text.literal("  → Coordinates: X=" + center.getX() + ", Y=" + (center.getY() + 3) + ", Z=" + center.getZ())
                     .formatted(Formatting.GREEN), false);
-                user.sendMessage(Text.literal("  → Distance: " + dist + " blocks away")
+                user.sendMessage(Text.literal("  → Horizontal distance: " + dist + " blocks")
                     .formatted(Formatting.YELLOW), false);
+                user.sendMessage(Text.literal("  → Run: /tp @s " + center.getX() + " " + (center.getY() + 3) + " " + center.getZ())
+                    .formatted(Formatting.AQUA), false);
                 user.sendMessage(Text.literal("  ⚠ Approach with extreme caution.")
                     .formatted(Formatting.RED), false);
             } else {
