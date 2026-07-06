@@ -1,98 +1,115 @@
 package com.pathogenesis.system;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.loot.LootTable;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.Heightmap;
+import net.minecraft.util.math.Direction;
 
 public class ParkourCourse {
 
     public static void register() {
-        ServerLifecycleEvents.SERVER_STARTED.register(ParkourCourse::onServerStart);
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            ServerPlayerEntity player = handler.getPlayer();
+            ServerWorld world = player.getServerWorld();
+            ArenaPersistentState state = ArenaPersistentState.getOrCreate(world);
+            if (state.isParkourBuilt()) return;
+
+            // Build directly at the player's feet, extending in the direction they are
+            // currently facing — guarantees the course starts somewhere they can see
+            // right now, instead of a computed offset that might be behind a wall.
+            BlockPos pos = player.getBlockPos();
+            Direction facing = player.getHorizontalFacing();
+
+            build(world, pos.getX(), pos.getY(), pos.getZ(), facing);
+            state.setParkourBuilt(true);
+
+            player.sendMessage(Text.literal(
+                "§b§lPARKOUR COURSE BUILT!§r §fLook " + facing.asString().toUpperCase() +
+                " right in front of you — glowing gold path leads to a reward chest!"
+            ), false);
+        });
     }
 
-    private static void onServerStart(MinecraftServer server) {
-        ServerWorld world = server.getOverworld();
-        ArenaPersistentState state = ArenaPersistentState.getOrCreate(world);
-        if (state.isParkourBuilt()) return;
+    private static void build(ServerWorld world, int cx, int cy, int cz, Direction facing) {
+        int fx = facing.getOffsetX();
+        int fz = facing.getOffsetZ();
+        // sideways vector, perpendicular to facing, for platform width
+        int sx = -fz;
+        int sz = fx;
 
-        BlockPos spawn = world.getSpawnPos();
-        int cx = spawn.getX();
-        int cz = spawn.getZ();
-        // Heightmap returns the surgery room ceiling; subtract room height to get the floor
-        int cy = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, cx, cz) - 30;
-
-        build(world, cx, cy, cz);
-        state.setParkourBuilt(true);
-    }
-
-    private static void build(ServerWorld world, int cx, int cy, int cz) {
-        // Parkour starts on the east side of the skin, inside the surgery room
-        // Platforms zigzag upward, chest at the top
-
-        int[][] platforms = {
-            // {relX, relY, relZ, size}  — starts 5 blocks north of spawn, goes east
-            { 5,  1, -5, 4},  // Start — large 4x4 platform right next to spawn
-            { 5,  2,  2, 3},  // easy
-            {11,  4,  6, 2},
-            { 5,  6, 12, 2},
-            {11,  8, 18, 2},
-            { 5, 10, 24, 2},
-            {12, 13, 28, 1},  // harder — 1x1
-            { 5, 15, 32, 2},
-            {12, 18, 28, 1},  // harder — 1x1
-            {18, 20, 32, 2},
-            {24, 23, 26, 1},  // hardest — 1x1
-            {18, 25, 32, 3},  // finish — nice big landing pad
+        // {forward distance, height gain, size} — all steps go straight ahead, flat first
+        int[][] steps = {
+            {0, 0, 4},   // Start — big platform right at the player's feet
+            {4, 0, 3},   // flat hop forward
+            {8, 0, 3},   // flat hop forward
+            {12, 1, 2},  // slight rise
+            {16, 1, 2},
+            {20, 2, 2},  // slight rise
+            {24, 2, 1},  // harder — 1x1
+            {28, 3, 2},
+            {32, 3, 1},  // harder — 1x1
+            {36, 4, 2},
+            {40, 4, 1},  // hardest — 1x1
+            {44, 5, 3},  // finish — big landing pad
         };
 
-        // Build each platform — clear a 6-block tall column first so nothing is buried
-        for (int[] p : platforms) {
-            int px = cx + p[0];
-            int py = cy + p[1];
-            int pz = cz + p[2];
-            int size = p[3];
+        int[][] platforms = new int[steps.length][3];
+        for (int i = 0; i < steps.length; i++) {
+            int dist = steps[i][0];
+            int rise = steps[i][1];
+            int size = steps[i][2];
+            platforms[i][0] = fx * dist; // relX
+            platforms[i][1] = rise;      // relY
+            platforms[i][2] = fz * dist; // relZ (using facing axis; combined below)
+        }
 
-            for (int dx = -1; dx < size + 1; dx++) {
-                for (int dz = -1; dz < size + 1; dz++) {
+        // Build each platform — clear a tall column first so nothing is buried,
+        // and always clear the player's own start position too.
+        for (int i = 0; i < platforms.length; i++) {
+            int px = cx + platforms[i][0];
+            int py = cy + platforms[i][1];
+            int pz = cz + platforms[i][2];
+            int size = steps[i][2];
+
+            for (int w = -1; w < size + 1; w++) {
+                for (int l = -1; l < size + 1; l++) {
                     for (int dy = -1; dy <= 6; dy++) {
-                        place(world, px + dx, py + dy, pz + dz, Blocks.AIR);
+                        int bx = px + sx * w + fx * l;
+                        int bz = pz + sz * w + fz * l;
+                        place(world, bx, py + dy, bz, Blocks.AIR);
                     }
                 }
             }
-            for (int dx = 0; dx < size; dx++) {
-                for (int dz = 0; dz < size; dz++) {
-                    Block block = (p[3] == 1) ? Blocks.GOLD_BLOCK :
-                                  (p[3] >= 4) ? Blocks.SEA_LANTERN :
-                                  Blocks.WHITE_CONCRETE;
-                    place(world, px + dx, py, pz + dz, block);
+            for (int w = 0; w < size; w++) {
+                for (int l = 0; l < size; l++) {
+                    Block block = (size == 1) ? Blocks.GOLD_BLOCK :
+                                  (size >= 4) ? Blocks.SEA_LANTERN :
+                                  Blocks.GOLD_BLOCK;
+                    int bx = px + sx * w + fx * l;
+                    int bz = pz + sz * w + fz * l;
+                    place(world, bx, py, bz, block);
                 }
             }
         }
 
         // Sign at the start
-        int[] start = platforms[0];
-        BlockPos signPos = new BlockPos(cx + start[0], cy + start[1] + 1, cz + start[2] - 1);
+        BlockPos signPos = new BlockPos(cx - fx, cy + 1, cz - fz);
         place(world, signPos.getX(), signPos.getY(), signPos.getZ(), Blocks.OAK_SIGN);
 
         // Chest on the final platform
         int[] finish = platforms[platforms.length - 1];
-        BlockPos chestPos = new BlockPos(
-            cx + finish[0] + 1,
-            cy + finish[1] + 1,
-            cz + finish[2] + 1
-        );
+        BlockPos chestPos = new BlockPos(cx + finish[0], cy + finish[1] + 1, cz + finish[2]);
         place(world, chestPos.getX(), chestPos.getY(), chestPos.getZ(), Blocks.CHEST);
 
-        // Assign loot table to the chest — contents generate when first opened
         if (world.getBlockEntity(chestPos) instanceof ChestBlockEntity chest) {
             RegistryKey<LootTable> lootTable = RegistryKey.of(
                 RegistryKeys.LOOT_TABLE,
@@ -101,9 +118,23 @@ public class ParkourCourse {
             chest.setLootTable(lootTable);
         }
 
-        // Glowstone torches along the parkour path as guides
-        for (int[] p : platforms) {
-            place(world, cx + p[0] - 1, cy + p[1] + 1, cz + p[2], Blocks.GLOWSTONE);
+        // Continuous glow trail directly beneath the path, one block below every platform,
+        // plus a glowstone marker above every platform so it's visible from a distance.
+        for (int i = 0; i < platforms.length - 1; i++) {
+            int[] a = platforms[i];
+            int[] b = platforms[i + 1];
+            int aDist = steps[i][0];
+            int bDist = steps[i + 1][0];
+            int stepCount = Math.max(Math.abs(bDist - aDist), 1);
+
+            for (int s = 0; s <= stepCount; s++) {
+                double t = (double) s / stepCount;
+                int gx = cx + (int) Math.round(a[0] + (b[0] - a[0]) * t);
+                int gy = cy + (int) Math.round(a[1] + (b[1] - a[1]) * t);
+                int gz = cz + (int) Math.round(a[2] + (b[2] - a[2]) * t);
+                place(world, gx, gy - 1, gz, Blocks.GLOWSTONE);
+                place(world, gx, gy + 3, gz, Blocks.GLOWSTONE);
+            }
         }
     }
 
