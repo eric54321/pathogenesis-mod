@@ -33,6 +33,7 @@ public class SkinTerrain {
 
         generateSkin(world, cx, cy, cz);
         buildSurgeryRoom(world, cx, cy, cz);
+        state.setCenter(new BlockPos(cx, cy, cz));
         state.setSkinTerrainBuilt(true);
     }
 

@@ -24,10 +24,12 @@ public class ParkourCourse {
         ArenaPersistentState state = ArenaPersistentState.getOrCreate(world);
         if (state.isParkourBuilt()) return;
 
-        BlockPos spawn = world.getSpawnPos();
-        int cx = spawn.getX();
-        int cz = spawn.getZ();
-        int cy = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, cx, cz);
+        BlockPos center = state.getCenter();
+        int cx = center.getX();
+        int cz = center.getZ();
+        // Use saved skin floor Y; fall back to heightmap if terrain not yet built
+        int cy = (center.getY() != 0) ? center.getY()
+                : world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, cx, cz);
 
         build(world, cx, cy, cz);
         state.setParkourBuilt(true);
@@ -53,23 +55,26 @@ public class ParkourCourse {
             {18, 25, 32, 3},  // finish — nice big landing pad
         };
 
-        // Build each platform
+        // Build each platform — clear a 6-block tall column first so nothing is buried
         for (int[] p : platforms) {
             int px = cx + p[0];
             int py = cy + p[1];
             int pz = cz + p[2];
             int size = p[3];
 
+            for (int dx = -1; dx < size + 1; dx++) {
+                for (int dz = -1; dz < size + 1; dz++) {
+                    for (int dy = -1; dy <= 6; dy++) {
+                        place(world, px + dx, py + dy, pz + dz, Blocks.AIR);
+                    }
+                }
+            }
             for (int dx = 0; dx < size; dx++) {
                 for (int dz = 0; dz < size; dz++) {
                     Block block = (p[3] == 1) ? Blocks.GOLD_BLOCK :
                                   (p[3] >= 4) ? Blocks.SEA_LANTERN :
                                   Blocks.WHITE_CONCRETE;
                     place(world, px + dx, py, pz + dz, block);
-                    // Clear air above each platform
-                    for (int dy = 1; dy <= 4; dy++) {
-                        place(world, px + dx, py + dy, pz + dz, Blocks.AIR);
-                    }
                 }
             }
         }
