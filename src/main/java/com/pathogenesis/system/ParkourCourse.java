@@ -38,19 +38,19 @@ public class ParkourCourse {
         // Platforms zigzag upward, chest at the top
 
         int[][] platforms = {
-            // {relX, relY, relZ, size}  size=2 means 2x2, size=3 means 3x3, size=1 means 1x1
-            {320,  1, -20, 4},  // Start — large 4x4 platform
-            {320,  2, -13, 3},  // easy
-            {326,  4,  -7, 2},
-            {320,  6,   0, 2},
-            {326,  8,   6, 2},
-            {320, 10,  12, 2},
-            {327, 13,  16, 1},  // harder — 1x1
-            {320, 15,  20, 2},
-            {327, 18,  16, 1},  // harder — 1x1
-            {333, 20,  20, 2},
-            {339, 23,  14, 1},  // hardest — 1x1
-            {333, 25,  20, 3},  // finish — nice big landing pad
+            // {relX, relY, relZ, size}  — starts 5 blocks north of spawn, goes east
+            { 5,  1, -5, 4},  // Start — large 4x4 platform right next to spawn
+            { 5,  2,  2, 3},  // easy
+            {11,  4,  6, 2},
+            { 5,  6, 12, 2},
+            {11,  8, 18, 2},
+            { 5, 10, 24, 2},
+            {12, 13, 28, 1},  // harder — 1x1
+            { 5, 15, 32, 2},
+            {12, 18, 28, 1},  // harder — 1x1
+            {18, 20, 32, 2},
+            {24, 23, 26, 1},  // hardest — 1x1
+            {18, 25, 32, 3},  // finish — nice big landing pad
         };
 
         // Build each platform
