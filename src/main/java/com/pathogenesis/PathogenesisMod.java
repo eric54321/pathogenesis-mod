@@ -9,6 +9,7 @@ import com.pathogenesis.system.ParkourCourse;
 import com.pathogenesis.system.SkinTerrain;
 import com.pathogenesis.system.WaveSpawner;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.block.Block;
@@ -18,6 +19,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.network.packet.s2c.play.ClearTitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
@@ -33,19 +35,61 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class PathogenesisMod implements ModInitializer {
 
     public static final String MOD_ID = "pathogenesis";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    private record ScheduledTask(long targetTick, Runnable action) {}
+    private record ScheduledTask(long targetTick, UUID owner, Runnable action) {}
     private static final List<ScheduledTask> scheduledTasks = new ArrayList<>();
 
+    // Tracks the active intro cutscene for each player so it can be skipped on demand.
+    private record CutsceneState(ServerWorld world, List<BlockPos> roomBlocks,
+                                  VillagerEntity doc, VillagerEntity bio) {}
+    private static final Map<UUID, CutsceneState> activeCutscenes = new HashMap<>();
+
     static void scheduleAt(MinecraftServer server, int delayTicks, Runnable action) {
-        scheduledTasks.add(new ScheduledTask(server.getTicks() + delayTicks, action));
+        scheduledTasks.add(new ScheduledTask(server.getTicks() + delayTicks, null, action));
+    }
+
+    static void scheduleAt(MinecraftServer server, int delayTicks, UUID owner, Runnable action) {
+        scheduledTasks.add(new ScheduledTask(server.getTicks() + delayTicks, owner, action));
+    }
+
+    // Instantly cleans up a player's cutscene: removes the room, clears effects/titles,
+    // cancels any remaining scheduled dialogue, and teleports them to world spawn.
+    private static void skipCutscene(ServerPlayerEntity player) {
+        UUID id = player.getUuid();
+        CutsceneState state = activeCutscenes.remove(id);
+        if (state == null) {
+            player.sendMessage(Text.literal("No cutscene is currently playing.").formatted(Formatting.GRAY), false);
+            return;
+        }
+
+        scheduledTasks.removeIf(task -> id.equals(task.owner()));
+
+        if (state.doc().isAlive()) state.doc().discard();
+        if (state.bio().isAlive()) state.bio().discard();
+
+        for (BlockPos pos : state.roomBlocks()) {
+            state.world().setBlockState(pos, Blocks.AIR.getDefaultState(), 2);
+        }
+
+        player.networkHandler.sendPacket(new ClearTitleS2CPacket(true));
+        player.removeStatusEffect(StatusEffects.DARKNESS);
+        player.removeStatusEffect(StatusEffects.SLOWNESS);
+
+        BlockPos spawnPos = state.world().getSpawnPos();
+        player.networkHandler.requestTeleport(
+            spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5, 0f, 0f);
+
+        player.sendMessage(Text.literal("Cutscene skipped.").formatted(Formatting.GRAY), false);
     }
 
     // Places a block and tracks it for later cleanup
@@ -78,6 +122,19 @@ public class PathogenesisMod implements ModInitializer {
                     it.remove();
                 }
             }
+        });
+
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            dispatcher.register(net.minecraft.server.command.CommandManager.literal("skipcutscene")
+                .executes(ctx -> {
+                    ServerPlayerEntity player = ctx.getSource().getPlayer();
+                    if (player == null) {
+                        ctx.getSource().sendError(Text.literal("Only players can run this command."));
+                        return 0;
+                    }
+                    skipCutscene(player);
+                    return 1;
+                }));
         });
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
@@ -206,6 +263,8 @@ public class PathogenesisMod implements ModInitializer {
             bio.setYaw(90f); bio.setBodyYaw(90f); bio.setHeadYaw(90f); // face west
             world.spawnEntity(bio);
 
+            activeCutscenes.put(player.getUuid(), new CutsceneState(world, roomBlocks, doc, bio));
+
             // Dialogue lines — each shown for ~55 ticks (~2.75 seconds)
             Runnable[] lines = {
                 () -> {
@@ -297,12 +356,13 @@ public class PathogenesisMod implements ModInitializer {
             int[] delays = {5, 60, 115, 170, 235, 300, 355, 415, 480};
             for (int i = 0; i < lines.length; i++) {
                 final Runnable line = lines[i];
-                scheduleAt(server, delays[i], line);
+                scheduleAt(server, delays[i], player.getUuid(), line);
             }
 
             // After the PATHOGENESIS title fades out: remove the room and TP player to world spawn
-            scheduleAt(server, 605, () -> {
+            scheduleAt(server, 605, player.getUuid(), () -> {
                 if (!player.isAlive()) return;
+                activeCutscenes.remove(player.getUuid());
                 for (BlockPos pos : roomBlocks) {
                     world.setBlockState(pos, Blocks.AIR.getDefaultState(), 2);
                 }
