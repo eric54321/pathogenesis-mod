@@ -46,30 +46,37 @@ public class ParkourCourse {
         int sx = -fz;
         int sz = fx;
 
-        // {forward distance, height gain, size} — all steps go straight ahead, flat first
+        // {forward distance, sideways offset, height gain, size} — mostly 1x1 platforms
+        // with long sprint-jump gaps (3-4 blocks) and lateral zigzags for real difficulty.
         int[][] steps = {
-            {0, 0, 4},   // Start — big platform right at the player's feet
-            {4, 0, 3},   // flat hop forward
-            {8, 0, 3},   // flat hop forward
-            {12, 1, 2},  // slight rise
-            {16, 1, 2},
-            {20, 2, 2},  // slight rise
-            {24, 2, 1},  // harder — 1x1
-            {28, 3, 2},
-            {32, 3, 1},  // harder — 1x1
-            {36, 4, 2},
-            {40, 4, 1},  // hardest — 1x1
-            {44, 5, 3},  // finish — big landing pad
+            {0,  0, 0, 4},   // Start — big platform right at the player's feet
+            {4,  0, 0, 2},   // warm-up hop
+            {8,  2, 1, 1},   // side jump + rise — 1x1
+            {12, 0, 1, 1},   // 1x1
+            {16, -2, 2, 1},  // side jump the other way — 1x1
+            {19, -2, 3, 1},  // tight gap — 1x1
+            {23, 0, 3, 1},   // 1x1
+            {27, 2, 4, 1},   // side jump — 1x1
+            {30, 2, 5, 1},   // tight gap — 1x1
+            {34, 0, 5, 1},   // 1x1
+            {38, -2, 6, 1},  // side jump — 1x1
+            {41, -2, 7, 1},  // tight gap — 1x1
+            {45, 0, 8, 1},   // 1x1
+            {49, 2, 9, 1},   // side jump — 1x1
+            {52, 2, 10, 1},  // tight gap — 1x1
+            {56, 0, 11, 1},  // 1x1
+            {60, 0, 12, 1},  // 1x1 — final stretch, highest point
+            {64, 0, 12, 3},  // finish — big landing pad
         };
 
         int[][] platforms = new int[steps.length][3];
         for (int i = 0; i < steps.length; i++) {
             int dist = steps[i][0];
-            int rise = steps[i][1];
-            int size = steps[i][2];
-            platforms[i][0] = fx * dist; // relX
-            platforms[i][1] = rise;      // relY
-            platforms[i][2] = fz * dist; // relZ (using facing axis; combined below)
+            int side = steps[i][1];
+            int rise = steps[i][2];
+            platforms[i][0] = fx * dist + sx * side; // relX
+            platforms[i][1] = rise;                  // relY
+            platforms[i][2] = fz * dist + sz * side; // relZ
         }
 
         // Build each platform — clear a tall column first so nothing is buried,
@@ -78,7 +85,7 @@ public class ParkourCourse {
             int px = cx + platforms[i][0];
             int py = cy + platforms[i][1];
             int pz = cz + platforms[i][2];
-            int size = steps[i][2];
+            int size = steps[i][3];
 
             for (int w = -1; w < size + 1; w++) {
                 for (int l = -1; l < size + 1; l++) {
@@ -123,9 +130,11 @@ public class ParkourCourse {
         for (int i = 0; i < platforms.length - 1; i++) {
             int[] a = platforms[i];
             int[] b = platforms[i + 1];
-            int aDist = steps[i][0];
-            int bDist = steps[i + 1][0];
-            int stepCount = Math.max(Math.abs(bDist - aDist), 1);
+            int stepCount = Math.max(
+                Math.abs(b[0] - a[0]),
+                Math.max(Math.abs(b[1] - a[1]), Math.abs(b[2] - a[2]))
+            );
+            stepCount = Math.max(stepCount, 1);
 
             for (int s = 0; s <= stepCount; s++) {
                 double t = (double) s / stepCount;
