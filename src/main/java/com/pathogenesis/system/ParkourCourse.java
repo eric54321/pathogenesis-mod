@@ -48,25 +48,26 @@ public class ParkourCourse {
 
         // {forward distance, sideways offset, height gain, size} — mostly 1x1 platforms
         // with long sprint-jump gaps (3-4 blocks) and lateral zigzags for real difficulty.
+        // Starts 20 blocks ahead of the player instead of right at their feet.
         int[][] steps = {
-            {0,  0, 0, 4},   // Start — big platform right at the player's feet
-            {4,  0, 0, 2},   // warm-up hop
-            {8,  2, 1, 1},   // side jump + rise — 1x1
-            {12, 0, 1, 1},   // 1x1
-            {16, -2, 2, 1},  // side jump the other way — 1x1
-            {19, -2, 3, 1},  // tight gap — 1x1
-            {23, 0, 3, 1},   // 1x1
-            {27, 2, 4, 1},   // side jump — 1x1
-            {30, 2, 5, 1},   // tight gap — 1x1
-            {34, 0, 5, 1},   // 1x1
-            {38, -2, 6, 1},  // side jump — 1x1
-            {41, -2, 7, 1},  // tight gap — 1x1
-            {45, 0, 8, 1},   // 1x1
-            {49, 2, 9, 1},   // side jump — 1x1
-            {52, 2, 10, 1},  // tight gap — 1x1
-            {56, 0, 11, 1},  // 1x1
-            {60, 0, 12, 1},  // 1x1 — final stretch, highest point
-            {64, 0, 12, 3},  // finish — big landing pad
+            {20, 0, 0, 4},   // Start — big platform 20 blocks ahead of the player
+            {24, 0, 0, 2},   // warm-up hop
+            {28, 2, 1, 1},   // side jump + rise — 1x1
+            {32, 0, 1, 1},   // 1x1
+            {36, -2, 2, 1},  // side jump the other way — 1x1
+            {39, -2, 3, 1},  // tight gap — 1x1
+            {43, 0, 3, 1},   // 1x1
+            {47, 2, 4, 1},   // side jump — 1x1
+            {50, 2, 5, 1},   // tight gap — 1x1
+            {54, 0, 5, 1},   // 1x1
+            {58, -2, 6, 1},  // side jump — 1x1
+            {61, -2, 7, 1},  // tight gap — 1x1
+            {65, 0, 8, 1},   // 1x1
+            {69, 2, 9, 1},   // side jump — 1x1
+            {72, 2, 10, 1},  // tight gap — 1x1
+            {76, 0, 11, 1},  // 1x1
+            {80, 0, 12, 1},  // 1x1 — final stretch, highest point
+            {84, 0, 12, 3},  // finish — big landing pad
         };
 
         int[][] platforms = new int[steps.length][3];
@@ -108,8 +109,9 @@ public class ParkourCourse {
             }
         }
 
-        // Sign at the start
-        BlockPos signPos = new BlockPos(cx - fx, cy + 1, cz - fz);
+        // Sign just before the start platform
+        int[] start = platforms[0];
+        BlockPos signPos = new BlockPos(cx + start[0] - fx, cy + 1, cz + start[2] - fz);
         place(world, signPos.getX(), signPos.getY(), signPos.getZ(), Blocks.OAK_SIGN);
 
         // Chest on the final platform
@@ -123,27 +125,6 @@ public class ParkourCourse {
                 Identifier.of("pathogenesis", "chests/parkour_reward")
             );
             chest.setLootTable(lootTable);
-        }
-
-        // Continuous glow trail directly beneath the path, one block below every platform,
-        // plus a glowstone marker above every platform so it's visible from a distance.
-        for (int i = 0; i < platforms.length - 1; i++) {
-            int[] a = platforms[i];
-            int[] b = platforms[i + 1];
-            int stepCount = Math.max(
-                Math.abs(b[0] - a[0]),
-                Math.max(Math.abs(b[1] - a[1]), Math.abs(b[2] - a[2]))
-            );
-            stepCount = Math.max(stepCount, 1);
-
-            for (int s = 0; s <= stepCount; s++) {
-                double t = (double) s / stepCount;
-                int gx = cx + (int) Math.round(a[0] + (b[0] - a[0]) * t);
-                int gy = cy + (int) Math.round(a[1] + (b[1] - a[1]) * t);
-                int gz = cz + (int) Math.round(a[2] + (b[2] - a[2]) * t);
-                place(world, gx, gy - 1, gz, Blocks.GLOWSTONE);
-                place(world, gx, gy + 3, gz, Blocks.GLOWSTONE);
-            }
         }
     }
 
