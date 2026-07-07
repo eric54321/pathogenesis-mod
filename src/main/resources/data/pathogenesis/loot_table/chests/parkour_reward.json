@@ -39,13 +39,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:leather_helmet",
-          "functions": [
-            {
-              "function": "minecraft:set_custom_name",
-              "name": { "text": "Immune Cell Helmet", "color": "aqua" }
-            }
-          ]
+          "name": "pathogenesis:immune_helmet"
         }
       ]
     },
@@ -54,13 +48,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:leather_chestplate",
-          "functions": [
-            {
-              "function": "minecraft:set_custom_name",
-              "name": { "text": "Immune Cell Chestplate", "color": "aqua" }
-            }
-          ]
+          "name": "pathogenesis:immune_chestplate"
         }
       ]
     },
@@ -69,13 +57,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:leather_leggings",
-          "functions": [
-            {
-              "function": "minecraft:set_custom_name",
-              "name": { "text": "Immune Cell Leggings", "color": "aqua" }
-            }
-          ]
+          "name": "pathogenesis:immune_leggings"
         }
       ]
     },
@@ -84,13 +66,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:leather_boots",
-          "functions": [
-            {
-              "function": "minecraft:set_custom_name",
-              "name": { "text": "Immune Cell Boots", "color": "aqua" }
-            }
-          ]
+          "name": "pathogenesis:immune_boots"
         }
       ]
     }
