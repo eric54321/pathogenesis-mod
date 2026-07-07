@@ -116,6 +116,10 @@ public class BacteriumBossEntity extends HostileEntity {
             enterPhase2(world);
         }
 
+        // Don't use any boss moves while a creative-mode player is around —
+        // testers flying around in creative shouldn't get blasted by attacks.
+        if (anyPlayerCreative(world)) return;
+
         // Radiant pulse strike fires after the warning tick
         if (radiantWarnTick >= 0) {
             radiantWarnTick--;
@@ -436,6 +440,13 @@ public class BacteriumBossEntity extends HostileEntity {
     // =========================================================================
     // Helpers
     // =========================================================================
+
+    private boolean anyPlayerCreative(ServerWorld world) {
+        for (PlayerEntity p : world.getPlayers()) {
+            if (p.isCreative()) return true;
+        }
+        return false;
+    }
 
     private void broadcastAttack(ServerWorld world, String msg, Formatting color) {
         for (PlayerEntity p : world.getPlayers()) {
