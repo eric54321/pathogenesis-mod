@@ -26,12 +26,12 @@ public class ParkourCourse {
             // Build directly at the player's feet, extending in the direction they are
             // currently facing — guarantees the course starts somewhere they can see
             // right now, instead of a computed offset that might be behind a wall.
-            // Flush with the player's feet so the start platform is reachable with a
-            // normal jump from the ground, instead of floating far above or below it.
+            // One block above the ground the player spawns on (the ground block is
+            // one below the player's feet position, so this sits right on top of it).
             BlockPos pos = player.getBlockPos();
             Direction facing = player.getHorizontalFacing();
 
-            build(world, pos.getX(), pos.getY(), pos.getZ(), facing);
+            build(world, pos.getX(), pos.getY() - 1, pos.getZ(), facing);
             state.setParkourBuilt(true);
 
             player.sendMessage(Text.literal(
