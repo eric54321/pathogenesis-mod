@@ -1,5 +1,6 @@
 package com.pathogenesis;
 
+import com.pathogenesis.init.ModArmorMaterials;
 import com.pathogenesis.init.ModEntities;
 import com.pathogenesis.init.ModItems;
 import com.pathogenesis.system.BossArena;
@@ -59,6 +60,7 @@ public class PathogenesisMod implements ModInitializer {
         LOGGER.info("Pathogenesis mod initializing...");
 
         ModEntities.register();
+        ModArmorMaterials.register();
         ModItems.register();
         WaveSpawner.register();
         HostHealth.register();

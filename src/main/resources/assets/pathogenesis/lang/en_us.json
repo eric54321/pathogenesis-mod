@@ -17,6 +17,10 @@
   "item.pathogenesis.antibody_sword": "Antibody Blade",
   "item.pathogenesis.healing_shield": "Healing Shield",
   "item.pathogenesis.antibody_shot": "Antibody Shot",
+  "item.pathogenesis.immune_helmet": "Immune Barrier Helmet",
+  "item.pathogenesis.immune_chestplate": "Immune Barrier Vest",
+  "item.pathogenesis.immune_leggings": "Immune Barrier Leggings",
+  "item.pathogenesis.immune_boots": "Immune Barrier Boots",
   "item.pathogenesis.cart_injector.tooltip1": "Reprograms your T-cells to permanently seek and destroy cancer cells.",
   "item.pathogenesis.cart_injector.tooltip2": "Permanently increases attack damage. One use only.",
   "itemGroup.pathogenesis.main": "Pathogenesis"

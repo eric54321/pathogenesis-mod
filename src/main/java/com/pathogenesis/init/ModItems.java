@@ -8,6 +8,7 @@ import com.pathogenesis.item.CARTInjectorItem;
 import com.pathogenesis.item.HealingShieldItem;
 import com.pathogenesis.item.PathogenTrackerItem;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
@@ -62,6 +63,31 @@ public class ModItems {
         new AntibodyShotItem(new Item.Settings().maxCount(32))
     );
 
+    // Immune Barrier armor set — weak, leather-tier starter defense
+    public static final ArmorItem IMMUNE_HELMET = Registry.register(
+        Registries.ITEM,
+        Identifier.of(PathogenesisMod.MOD_ID, "immune_helmet"),
+        new ArmorItem(ModArmorMaterials.IMMUNE_BARRIER, ArmorItem.Type.HELMET, new Item.Settings().maxCount(1))
+    );
+
+    public static final ArmorItem IMMUNE_CHESTPLATE = Registry.register(
+        Registries.ITEM,
+        Identifier.of(PathogenesisMod.MOD_ID, "immune_chestplate"),
+        new ArmorItem(ModArmorMaterials.IMMUNE_BARRIER, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxCount(1))
+    );
+
+    public static final ArmorItem IMMUNE_LEGGINGS = Registry.register(
+        Registries.ITEM,
+        Identifier.of(PathogenesisMod.MOD_ID, "immune_leggings"),
+        new ArmorItem(ModArmorMaterials.IMMUNE_BARRIER, ArmorItem.Type.LEGGINGS, new Item.Settings().maxCount(1))
+    );
+
+    public static final ArmorItem IMMUNE_BOOTS = Registry.register(
+        Registries.ITEM,
+        Identifier.of(PathogenesisMod.MOD_ID, "immune_boots"),
+        new ArmorItem(ModArmorMaterials.IMMUNE_BARRIER, ArmorItem.Type.BOOTS, new Item.Settings().maxCount(1))
+    );
+
     /**
      * Called from PathogenesisMod.onInitialize().
      * Adds our items to the Medicine & Potions creative tab so testers
@@ -76,6 +102,10 @@ public class ModItems {
             entries.add(ANTIBODY_SWORD);
             entries.add(HEALING_SHIELD);
             entries.add(ANTIBODY_SHOT);
+            entries.add(IMMUNE_HELMET);
+            entries.add(IMMUNE_CHESTPLATE);
+            entries.add(IMMUNE_LEGGINGS);
+            entries.add(IMMUNE_BOOTS);
         });
 
         PathogenesisMod.LOGGER.info("Pathogenesis items registered.");
