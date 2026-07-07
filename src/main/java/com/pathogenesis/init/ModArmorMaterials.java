@@ -25,13 +25,13 @@ public class ModArmorMaterials {
         Identifier.of(PathogenesisMod.MOD_ID, "immune_barrier"),
         new ArmorMaterial(
             Map.of(
-                ArmorItem.Type.HELMET, 1,
-                ArmorItem.Type.CHESTPLATE, 2,
-                ArmorItem.Type.LEGGINGS, 2,
-                ArmorItem.Type.BOOTS, 1
+                ArmorItem.Type.HELMET, 2,
+                ArmorItem.Type.CHESTPLATE, 5,
+                ArmorItem.Type.LEGGINGS, 4,
+                ArmorItem.Type.BOOTS, 2
             ),
-            9, // enchantability — same as leather
-            RegistryEntry.of(SoundEvents.ITEM_ARMOR_EQUIP_LEATHER.value()),
+            12, // enchantability — a bit above leather
+            RegistryEntry.of(SoundEvents.ITEM_ARMOR_EQUIP_CHAIN.value()),
             () -> Ingredient.ofItems(net.minecraft.item.Items.LEATHER),
             List.of(new ArmorMaterial.Layer(Identifier.of(PathogenesisMod.MOD_ID, "immune_barrier"))),
             0.0f, // toughness
