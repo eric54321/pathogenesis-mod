@@ -33,7 +33,7 @@ public class ArenaPersistentState extends PersistentState {
         nbt.putBoolean("built", built);
         nbt.putBoolean("bossDefeated", bossDefeated);
         nbt.putBoolean("skinTerrainBuilt", skinTerrainBuilt);
-        nbt.putBoolean("parkourBuilt8", parkourBuilt);
+        nbt.putBoolean("parkourBuilt9", parkourBuilt);
         nbt.putInt("cx", cx);
         nbt.putInt("cy", cy);
         nbt.putInt("cz", cz);
@@ -45,7 +45,7 @@ public class ArenaPersistentState extends PersistentState {
         s.built = nbt.getBoolean("built");
         s.bossDefeated = nbt.getBoolean("bossDefeated");
         s.skinTerrainBuilt = nbt.getBoolean("skinTerrainBuilt");
-        s.parkourBuilt = nbt.getBoolean("parkourBuilt8");
+        s.parkourBuilt = nbt.getBoolean("parkourBuilt9");
         s.cx = nbt.getInt("cx");
         s.cy = nbt.getInt("cy");
         s.cz = nbt.getInt("cz");
