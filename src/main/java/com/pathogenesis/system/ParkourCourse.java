@@ -23,20 +23,21 @@ public class ParkourCourse {
             ArenaPersistentState state = ArenaPersistentState.getOrCreate(world);
             if (state.isParkourBuilt()) return;
 
-            // Build directly at the player's feet, extending in the direction they are
-            // currently facing — guarantees the course starts somewhere they can see
-            // right now, instead of a computed offset that might be behind a wall.
-            // One block above the ground the player spawns on (the ground block is
-            // one below the player's feet position, so this sits right on top of it).
-            BlockPos pos = player.getBlockPos();
-            Direction facing = player.getHorizontalFacing();
+            // Build relative to world spawn — NOT the player's live position — because
+            // the intro cutscene (registered separately) teleports the player up into
+            // a sky room and then drops them back at world spawn facing south (yaw 0)
+            // once it finishes. Anchoring to their pre-cutscene position meant the course
+            // ended up wherever they happened to be standing before the TP, not where
+            // they actually land afterward.
+            BlockPos pos = world.getSpawnPos();
+            Direction facing = Direction.SOUTH;
 
             build(world, pos.getX(), pos.getY() - 1, pos.getZ(), facing);
             state.setParkourBuilt(true);
 
             player.sendMessage(Text.literal(
                 "§b§lPARKOUR COURSE BUILT!§r §fLook " + facing.asString().toUpperCase() +
-                " right in front of you — glowing gold path leads to a reward chest!"
+                " right in front of you at spawn — glowing gold path leads to a reward chest!"
             ), false);
         });
     }
