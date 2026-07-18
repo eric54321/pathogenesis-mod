@@ -12,8 +12,10 @@ This folder always has the latest playable build of the mod. To join a Pathogene
 
 Copy both files from this `dist` folder into your `mods` folder:
 
-- `pathogenesis-1.0.0.jar` (the mod itself)
+- `pathogenesis-latest.jar` (the mod itself — always the newest build)
 - `fabric-api-0.116.12+1.21.1.jar` (required dependency)
+
+Older dated builds (e.g. `pathogenesis-2026.07.18-1.jar`) are kept in this folder as build history — you don't need them unless you're rolling back to an older version on purpose.
 
 Your `mods` folder is usually at:
 
