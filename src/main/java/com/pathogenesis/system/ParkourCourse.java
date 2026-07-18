@@ -23,13 +23,13 @@ public class ParkourCourse {
             ArenaPersistentState state = ArenaPersistentState.getOrCreate(world);
             if (state.isParkourBuilt()) return;
 
-            // Build relative to world spawn — NOT the player's live position — because
-            // the intro cutscene (registered separately) teleports the player up into
-            // a sky room and then drops them back at world spawn facing south (yaw 0)
-            // once it finishes. Anchoring to their pre-cutscene position meant the course
-            // ended up wherever they happened to be standing before the TP, not where
-            // they actually land afterward.
-            BlockPos pos = world.getSpawnPos();
+            // Build relative to the skin terrain's saved floor height — NOT
+            // world.getSpawnPos(), whose Y is the stale world-generation surface
+            // height from before SkinTerrain regenerated the ground here, and NOT
+            // the player's live position, since the intro cutscene (registered
+            // separately) teleports them up into a sky room and drops them back at
+            // world spawn X/Z facing south (yaw 0) once it finishes.
+            BlockPos pos = state.getCenter();
             Direction facing = Direction.SOUTH;
 
             build(world, pos.getX(), pos.getY(), pos.getZ(), facing);

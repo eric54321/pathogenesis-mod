@@ -3,6 +3,7 @@ package com.pathogenesis;
 import com.pathogenesis.init.ModArmorMaterials;
 import com.pathogenesis.init.ModEntities;
 import com.pathogenesis.init.ModItems;
+import com.pathogenesis.system.ArenaPersistentState;
 import com.pathogenesis.system.BossArena;
 import com.pathogenesis.system.HostHealth;
 import com.pathogenesis.system.ParkourCourse;
@@ -62,6 +63,14 @@ public class PathogenesisMod implements ModInitializer {
         scheduledTasks.add(new ScheduledTask(server.getTicks() + delayTicks, owner, action));
     }
 
+    // Where the player actually lands after the cutscene. Prefers the skin terrain's
+    // saved floor height over world.getSpawnPos(), whose Y is the stale
+    // world-generation surface height from before SkinTerrain regenerated the ground.
+    private static BlockPos landingSpot(ServerWorld world) {
+        ArenaPersistentState state = ArenaPersistentState.getOrCreate(world);
+        return state.isSkinTerrainBuilt() ? state.getCenter() : world.getSpawnPos();
+    }
+
     // Instantly cleans up a player's cutscene: removes the room, clears effects/titles,
     // cancels any remaining scheduled dialogue, and teleports them to world spawn.
     private static void skipCutscene(ServerPlayerEntity player) {
@@ -85,7 +94,7 @@ public class PathogenesisMod implements ModInitializer {
         player.removeStatusEffect(StatusEffects.DARKNESS);
         player.removeStatusEffect(StatusEffects.SLOWNESS);
 
-        BlockPos spawnPos = state.world().getSpawnPos();
+        BlockPos spawnPos = landingSpot(state.world());
         player.networkHandler.requestTeleport(
             spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5, 0f, 0f);
 
@@ -366,7 +375,7 @@ public class PathogenesisMod implements ModInitializer {
                 for (BlockPos pos : roomBlocks) {
                     world.setBlockState(pos, Blocks.AIR.getDefaultState(), 2);
                 }
-                BlockPos spawnPos = world.getSpawnPos();
+                BlockPos spawnPos = landingSpot(world);
                 player.networkHandler.requestTeleport(
                     spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5, 0f, 0f);
             });
