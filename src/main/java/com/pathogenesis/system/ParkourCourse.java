@@ -32,7 +32,7 @@ public class ParkourCourse {
             BlockPos pos = state.getCenter();
             Direction facing = Direction.SOUTH;
 
-            build(world, pos.getX(), pos.getY(), pos.getZ(), facing);
+            build(world, pos.getX(), 91, pos.getZ(), facing);
             state.setParkourBuilt(true);
 
             player.sendMessage(Text.literal(
